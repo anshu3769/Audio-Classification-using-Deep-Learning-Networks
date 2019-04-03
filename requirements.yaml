@@ -1,0 +1,11 @@
+name: vision
+dependencies:
+  - python==3.6.5
+  - numpy
+  - pandas
+  - matplotlib
+  - nb_conda
+  - pip:
+    - librosa
+    - torch==0.4.1
+    
