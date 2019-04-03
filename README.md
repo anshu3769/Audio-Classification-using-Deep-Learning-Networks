@@ -1,6 +1,6 @@
 # bdml
 Creating Dataset command - 
-python create_dataset.py <original-folder> --out_path <path to save the data for project>
+python create_dataset.py \\<original-folder> --out_path <path to save the data for project>
   
   
 We have run this project on NYU Prince server using Slurm batch script.
