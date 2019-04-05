@@ -1,6 +1,17 @@
 # bdml
+1. mkdir bdml 
+2. cd bdml 
+3. git clone 
+4. Download Speech data to this directory
+5. gunzip speech_commands_v0.01.tar.gz
+7. mkdir data 
+8. cd data
+9. tar xopf ..path_to/speech_commands_v0.01.tar 
+10. cd ..
+11. mkdir speechdata 
+12. cd BDML
 Creating Dataset command - 
-python create_dataset.py \<original-folder> --out_path \<path to save the data for project>
+python create_dataset.py ../data --out_path ../speechdata
   
   
 We have run this project on NYU Prince server using Slurm batch script.
