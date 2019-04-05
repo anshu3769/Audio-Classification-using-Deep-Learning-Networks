@@ -58,6 +58,6 @@ def val(loader, model, cuda, verbose=True):
 
     test_loss /= len(loader.dataset)
     if verbose:
-        print('\nTest set: Average loss: {:.4f}, Accuracy: {}/{} ({:.0f}%)\n'.format(
+        print('\nValidation set: Average loss: {:.4f}, Accuracy: {}/{} ({:.0f}%)\n'.format(
             test_loss, correct, len(loader.dataset), 100. * correct / len(loader.dataset)))
     return test_loss
