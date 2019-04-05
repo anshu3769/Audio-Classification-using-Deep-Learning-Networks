@@ -12,4 +12,4 @@
 
 module load anaconda3/5.3.1
 source activate speech
-python run.py --train_path <train_data_path> --valid_path <valid_data_path> --test_path <test_data_path>
+python run.py --train_path ../speechdata/train/ --valid_path ../speechdata/valid/ --test_path ../speechdata/test/ --epochs 1
