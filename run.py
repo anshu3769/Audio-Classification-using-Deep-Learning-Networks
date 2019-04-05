@@ -5,7 +5,7 @@ import torch.optim as optim
 from data_loader import SpeechDataLoader
 import numpy as np
 from model import LeNet, VGG
-from train import train, test
+from train import train, test, val
 import os
 
 
@@ -106,7 +106,7 @@ epoch = 1
 # training with early stopping
 while (epoch < args.epochs + 1) and (iteration < args.patience):
     train(train_loader, model, optimizer, epoch, args.cuda, args.log_interval)
-    valid_loss = test(valid_loader, model, args.cuda)
+    valid_loss = val(valid_loader, model, args.cuda)
     if valid_loss > best_valid_loss:
         iteration += 1
         print('Loss was not improved, iteration {0}'.format(str(iteration)))
