@@ -13,7 +13,7 @@ Steps to run on NYU Server
 12. cd BDML
 13. module load anaconda3/5.3.1
 14. conda env create -f requirements.yaml
-15. source activate speech
+15. source activate bdml
 16. python create_dataset.py ../data --out_path ../speechdata
 17. python run.py --train_path ../speechdata/train/ --valid_path ../speechdata/valid --test_path ../speechdata/test
 
