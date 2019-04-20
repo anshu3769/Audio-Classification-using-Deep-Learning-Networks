@@ -21,7 +21,10 @@ def train(loader, model, optimizer, epoch, cuda, log_interval, verbose=True):
                 print('Train Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}'.format(
                     epoch, batch_idx * len(data), len(loader.dataset), 100.
                     * batch_idx / len(loader), loss.data[0]))
-    return global_epoch_loss / len(loader.dataset)
+    global_epoch_loss=global_epoch_loss / len(loader.dataset)
+    print('\nTrain set: Average loss: {:.4f}\n'.format(
+            test_loss))
+    return global_epoch_loss
 
 
 def test(loader, model, cuda, verbose=True):
