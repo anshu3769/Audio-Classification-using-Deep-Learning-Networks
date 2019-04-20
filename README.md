@@ -1,4 +1,5 @@
 # bdml
+Steps to run on NYU Server 
 1. mkdir bdml 
 2. cd bdml 
 3. git clone 
@@ -10,19 +11,21 @@
 10. cd ..
 11. mkdir speechdata 
 12. cd BDML
-Creating Dataset command - 
-python create_dataset.py ../data --out_path ../speechdata
-  
-  
+13. module load anaconda3/5.3.1
+14. conda env create -f requirements.yaml
+15. source activate speech
+16. python create_dataset.py ../data --out_path ../speechdata
+17. python run.py --train_path ../speechdata/train/ --valid_path ../speechdata/valid --test_path ../speechdata/test
+
+
 We have run this project on NYU Prince server using Slurm batch script.
 
-1. Create environment using requiremnets.yaml
-conda env create -f requirements.yaml
-
-2. Run the batch script 
+1. To run using that the above steps have to be used once to create the environment 
+2. After first use steps 13, 14, 15 and 17 can run using the batch script provided
+3. Run the batch script 
 sbatch runbatch.s
 
-On local 
-make sure all requirements are installed - (torch, librosa, numpy) and run command
+4. To change the configuration running changes can be made to batch script
 
-python run.py --train_path <train_data_path> --valid_path <valid_data_path> --test_path <test_data_path>
+
+
