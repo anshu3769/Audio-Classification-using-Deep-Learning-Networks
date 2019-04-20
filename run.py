@@ -24,6 +24,8 @@ parser.add_argument('--test_batch_size', type=int, default=100,
                     metavar='N', help='batch size for testing')
 parser.add_argument('--arc', default='LeNet',
                     help='network architecture: LeNet, VGG11, VGG13, VGG16, VGG19')
+parser.add_argument('--input_format', default='STFT',
+                    help='Input format: STFT, MEL, MFCC, RAW')
 parser.add_argument('--epochs', type=int, default=100,
                     metavar='N', help='number of epochs to train')
 parser.add_argument('--lr', type=float, default=0.001,
@@ -57,28 +59,32 @@ torch.manual_seed(args.seed)
 if args.cuda:
     torch.cuda.manual_seed(args.seed)
 
+
 # loading data
 train_dataset = SpeechDataLoader(args.train_path, window_size=args.window_size, window_stride=args.window_stride,
-                               window_type=args.window_type, normalize=args.normalize)
+                               window_type=args.window_type, normalize=args.normalize,input_format=args.input_format)
 train_loader = torch.utils.data.DataLoader(
     train_dataset, batch_size=args.batch_size, shuffle=True,
     num_workers=20, pin_memory=args.cuda, sampler=None)
 
 valid_dataset = SpeechDataLoader(args.valid_path, window_size=args.window_size, window_stride=args.window_stride,
-                               window_type=args.window_type, normalize=args.normalize)
+                               window_type=args.window_type, normalize=args.normalize,input_format=args.input_format)
 valid_loader = torch.utils.data.DataLoader(
     valid_dataset, batch_size=args.batch_size, shuffle=None,
     num_workers=20, pin_memory=args.cuda, sampler=None)
 
 test_dataset = SpeechDataLoader(args.test_path, window_size=args.window_size, window_stride=args.window_stride,
-                              window_type=args.window_type, normalize=args.normalize)
+                              window_type=args.window_type, normalize=args.normalize,input_format=args.input_format)
 test_loader = torch.utils.data.DataLoader(
     test_dataset, batch_size=args.test_batch_size, shuffle=None,
     num_workers=20, pin_memory=args.cuda, sampler=None)
 
 # build model
 if args.arc == 'LeNet':
-    model = LeNet()
+    if(args.input_format=='STFT'):
+    	model = LeNet(16280)
+    if(args.input_format=='MEL'):
+	model = LeNet(16280)
 elif args.arc.startswith('VGG'):
     model = VGG(args.arc)
 else:
