@@ -11,5 +11,5 @@
 #SBATCH --gres=gpu:1 -c1
 
 module load anaconda3/5.3.1
-source activate speech
+source activate bdml
 python run.py --train_path ../speechdata/train/ --valid_path ../speechdata/valid/ --test_path ../speechdata/test/ --arc VGG11
