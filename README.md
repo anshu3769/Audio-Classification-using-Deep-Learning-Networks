@@ -22,9 +22,8 @@ We have run this project on NYU Prince server using Slurm batch script.
 
 1. To run using that the above steps have to be used once to create the environment 
 2. After first use steps 13, 14, 15 and 17 can run using the batch script provided
-3. Run the batch script 
+3. Run the batch script --
 sbatch runbatch.s
-
 4. To change the configuration running changes can be made to batch script
 
 
