@@ -1,4 +1,4 @@
-# bdml
+# Speech to Text Classification (Keyword spotting)
 Steps to run on NYU Server 
 1. mkdir bdml 
 2. cd bdml 
