@@ -1,3 +1,4 @@
+
 from __future__ import print_function
 import argparse
 import torch
@@ -53,7 +54,7 @@ parser.add_argument('--normalize', default=True,
                     help='boolean, wheather or not to normalize the spect')
 
 args = parser.parse_args()
-
+print(args)
 args.cuda = args.cuda and torch.cuda.is_available()
 torch.manual_seed(args.seed)
 if args.cuda:
@@ -81,16 +82,42 @@ test_loader = torch.utils.data.DataLoader(
 
 # build model
 if args.arc == 'LeNet':
-	
-	if(args.input_format=='STFT'):
-		
-		model = LeNet(16280)
-	if(args.input_format=='MEL'):
-		model = LeNet(12760)
+    if(args.input_format=='STFT'):
+        model = LeNet(16280)
+    elif(args.input_format=='MEL'):
+        model = LeNet(12760)
+    elif(args.input_format=='MFCC'):
+        model = LeNet(3080)
+    else:
+        model = LeNet(16280)
+
+
+    
+    
 elif args.arc.startswith('VGG'):
-    model = VGG(args.arc)
+    if(args.input_format=='STFT'):
+        model = VGG(args.arc, 7680)
+    elif(args.input_format=='MEL'):
+        model = VGG(args.arc, 6144)
+    elif(args.input_format=='MFCC'):
+        model = VGG(args.arc, 1536)
+    else:
+        model = VGG(args.arc, 7680)
+
+
+
+
 else:
-    model = LeNet()
+    if(args.input_format=='STFT'):
+        model = LeNet(16280)
+    elif(args.input_format=='MEL'):
+        model = LeNet(12760)
+    elif(args.input_format=='MFCC'):
+        model = LeNet(3080)
+    else:
+        model = LeNet(16280)
+
+
 
 if args.cuda:
     print('Using CUDA with {0} GPUs'.format(torch.cuda.device_count()))

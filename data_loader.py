@@ -60,6 +60,11 @@ def spect_loader(path, window_size, window_stride, window, normalize, input_form
     if(input_format=="MEL"):
         S=librosa.feature.melspectrogram(y, sr=sr,n_fft=n_fft, hop_length=hop_length)
         spect = librosa.power_to_db(abs(S))
+    if(input_format=="MFCC"):
+        mfcc = librosa.feature.mfcc(y=y, sr=sr, n_mfcc=40)
+        spect = librosa.power_to_db(abs(mfcc))
+
+    
     
     
     # make all spects with the same dims

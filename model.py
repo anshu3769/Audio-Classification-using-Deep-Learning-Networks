@@ -12,19 +12,19 @@ class LeNet(nn.Module):
         self.fc2 = nn.Linear(1000, 30)
 
     def forward(self, x):
-        print(x.shape)
+        
         x = F.relu(F.max_pool2d(self.conv1(x), 2))
-        print(x.shape)
+        
         x = F.relu(F.max_pool2d(self.conv2_drop(self.conv2(x)), 2))
-        print(x.shape)
+        
         x = x.view(x.size(0), -1)
-        print(x.shape)
+        
         x = F.relu(self.fc1(x))
-        print(x.shape)
+        
         x = F.dropout(x, training=self.training)
-        print(x.shape)
+        
         x = self.fc2(x)
-        print(x.shape)
+       
         return F.log_softmax(x)
 
 
@@ -52,15 +52,19 @@ cfg = {
 
 
 class VGG(nn.Module):
-    def __init__(self, vgg_name):
+    def __init__(self, vgg_name, linear_layer_dim):
         super(VGG, self).__init__()
         self.features = _make_layers(cfg[vgg_name])
-        self.fc1 = nn.Linear(7680, 512)
+        self.fc1 = nn.Linear(linear_layer_dim, 512)
         self.fc2 = nn.Linear(512, 30)
 
     def forward(self, x):
         out = self.features(x)
+        
         out = out.view(out.size(0), -1)
+        
         out = self.fc1(out)
+        
         out = self.fc2(out)
+        
         return F.log_softmax(out)
