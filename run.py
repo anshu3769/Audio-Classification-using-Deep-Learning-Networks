@@ -81,10 +81,10 @@ test_loader = torch.utils.data.DataLoader(
 
 # build model
 if args.arc == 'LeNet':
-    if(args.input_format=='STFT'):
-    	model = LeNet(16280)
-    if(args.input_format=='MEL'):
-	model = LeNet(16280)
+	if(args.input_format=='STFT'):
+		model = LeNet(16280)
+	if(args.input_format=='MEL'):
+		model = LeNet(16280)
 elif args.arc.startswith('VGG'):
     model = VGG(args.arc)
 else:
