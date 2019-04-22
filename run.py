@@ -87,7 +87,7 @@ if args.arc == 'LeNet':
     elif(args.input_format=='MEL'):
         model = LeNet(12760)
     elif(args.input_format=='MFCC'):
-        model = LeNet(3080)
+        model = LeNet(880)
     else:
         model = LeNet(16280)
 
@@ -95,15 +95,8 @@ if args.arc == 'LeNet':
     
     
 elif args.arc.startswith('VGG'):
-    if(args.input_format=='STFT'):
-        model = VGG(args.arc, 7680)
-    elif(args.input_format=='MEL'):
-        model = VGG(args.arc, 6144)
-    elif(args.input_format=='MFCC'):
-        model = VGG(args.arc, 1536)
-    else:
-        model = VGG(args.arc, 7680)
-
+    
+    model = VGG(args.arc, 7680)
 
 
 
@@ -113,7 +106,7 @@ else:
     elif(args.input_format=='MEL'):
         model = LeNet(12760)
     elif(args.input_format=='MFCC'):
-        model = LeNet(3080)
+        model = LeNet(880)
     else:
         model = LeNet(16280)
 
@@ -136,15 +129,17 @@ else:
 best_valid_loss = np.inf
 iteration = 0
 epoch = 1
-
+itr=0
 
 # training with early stopping
-while (epoch < args.epochs + 1) and (iteration < args.patience):
+while (epoch < args.epochs + 1) and (iteration < args.patience) and (itr<args.patience):
     train(train_loader, model, optimizer, epoch, args.cuda, args.log_interval)
     valid_loss = val(valid_loader, model, args.cuda)
     if valid_loss > best_valid_loss:
         iteration += 1
         print('Loss was not improved, iteration {0}'.format(str(iteration)))
+        if(iteration==1):
+            itr+=1
     else:
         print('Saving model...')
         iteration = 0

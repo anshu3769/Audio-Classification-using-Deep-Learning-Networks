@@ -59,14 +59,13 @@ def spect_loader(path, window_size, window_stride, window, normalize, input_form
     
     if(input_format=="MEL"):
         S=librosa.feature.melspectrogram(y, sr=sr,n_fft=n_fft, hop_length=hop_length)
-        spect = librosa.power_to_db(abs(S))
+        spect = S
     if(input_format=="MFCC"):
-        S=librosa.feature.melspectrogram(y, sr=sr,n_fft=n_fft,hop_length=hop_length)
-        logS = librosa.power_to_db(abs(S))
-        mfcc = librosa.feature.mfcc(S=logS, n_mfcc=13)
+        
+        mfcc = librosa.feature.mfcc(y, sr=sr)
 
 
-        spect = librosa.feature.delta(mfcc, order=2)
+        spect = mfcc
 
     
     
