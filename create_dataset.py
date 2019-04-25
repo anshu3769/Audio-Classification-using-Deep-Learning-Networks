@@ -4,6 +4,7 @@ import argparse
 
 
 def move_files(original_fold, data_fold, data_filename):
+    """ Move the data from original_fold to data_fold """
     with open(data_filename) as f:
         for line in f.readlines():
             vals = line.split('/')
@@ -14,6 +15,7 @@ def move_files(original_fold, data_fold, data_filename):
 
 
 def create_train_fold(original_fold, data_fold, test_fold):
+    """ Create the train data folder"""
     # list dirs
     dir_names = list()
     for file in os.listdir(test_fold):
@@ -27,6 +29,7 @@ def create_train_fold(original_fold, data_fold, test_fold):
 
 
 def make_dataset(original_fold, out_path):
+    """Create the train, valid and test folder and move data in them """
     validation_path = os.path.join(original_fold, 'validation_list.txt')
     test_path = os.path.join(original_fold, 'testing_list.txt')
 
