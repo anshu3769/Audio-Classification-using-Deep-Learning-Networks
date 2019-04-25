@@ -1,30 +1,43 @@
 # Speech to Text Classification (Keyword spotting)
-Steps to run on NYU Server 
-1. mkdir bdml 
-2. cd bdml 
-3. git clone 
-4. Download Speech data to this directory
-5. gunzip speech_commands_v0.01.tar.gz
-7. mkdir data 
-8. cd data
-9. tar xopf ..path_to/speech_commands_v0.01.tar 
-10. cd ..
-11. mkdir speechdata 
-12. cd BDML
-13. module load anaconda3/5.3.1
-14. conda env create -f requirements.yaml
-15. source activate bdml
-16. python create_dataset.py ../data --out_path ../speechdata
-17. python run.py --train_path ../speechdata/train/ --valid_path ../speechdata/valid --test_path ../speechdata/test
+The aim of the project is to analyse performance of various neural networks in identifying the word spoken by a person. The data used in this process is Google command dataset. It contains ~65k audio files each of which has a word spoken by a person  anf tag for that file which is the text for that audio file. There are 30 different words in the dataset spoken by different people. Thus, the task is to classify the audio files based on the word spoken. We ran the following neural networks to perform the task:
+1. Lenet
+2. VGG
+3. ResNet
+4. RNN (TO BE ADDED)
+
+# Performance of the networks
+TO BE ADDED
+
+# Steps to train/test a model
+Please follow the steps to train/test a model: 
+## Setup the environment
+  a. mkdir bdml 
+  b. cd bdml 
+  c. git clone 
+  d. module load anaconda3/5.3.1
+  e. conda env create -f requirements.yaml
+  f. source activate bdml
+  
+## Load the dataset
+  a. Download Speech data to this directory
+  b. gunzip speech_commands_v0.01.tar.gz
+  c. mkdir data 
+  d. cd data
+  e. tar xopf ..path_to/speech_commands_v0.01.tar 
+  f. cd ..
+  g. mkdir speechdata 
+  h. cd BDML
+  i. python create_dataset.py ../data --out_path ../speechdata
+
+## Run the model
+  a. python run.py --train_path ../speechdata/train/ --valid_path ../speechdata/valid --test_path ../speechdata/test
+  Note: You can specify other arguments to the run.py script like batch_size, model e.t.c. You can find them all in the file itself.
 
 
 We have run this project on NYU Prince server using Slurm batch script.
-
-1. To run using that the above steps have to be used once to create the environment 
-2. After first use steps 13, 14, 15 and 17 can run using the batch script provided
-3. Run the batch script --
-sbatch runbatch.s
-4. To change the configuration running changes can be made to batch script
+## To run the batch script on NYU server: 
+a. sbatch runbatch.s
+Note: You can change the arguments in the runbatch.s script to run with various network configuration.
 
 
 
