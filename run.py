@@ -86,7 +86,7 @@ test_loader = torch.utils.data.DataLoader(
 if args.arc == 'LeNet':
     if(args.input_format=='STFT'):
         model = LeNet(16280)
-    elif(args.input_format=='MEL'):
+    elif(args.input_format=='MEL100'):
         model = LeNet(9680)
 
     else:
@@ -105,7 +105,7 @@ elif args.arc.startswith('ResNet'):
 else:
     if(args.input_format=='STFT'):
         model = LeNet(16280)
-    elif(args.input_format=='MEL'):
+    elif(args.input_format=='MEL100'):
         model = LeNet(9680)
 
     else:
