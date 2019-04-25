@@ -11,33 +11,33 @@ TO BE ADDED
 # Steps to train/test a model
 Please follow the steps to train/test a model: 
 ## Setup the environment
-  a. mkdir bdml 
-  b. cd bdml 
-  c. git clone 
-  d. module load anaconda3/5.3.1
-  e. conda env create -f requirements.yaml
-  f. source activate bdml
+  1. mkdir bdml 
+  2. cd bdml 
+  3. git clone 
+  4. module load anaconda3/5.3.1
+  4. conda env create -f requirements.yaml
+  6. source activate bdml
   
 ## Load the dataset
-  a. Download Speech data to this directory
-  b. gunzip speech_commands_v0.01.tar.gz
-  c. mkdir data 
-  d. cd data
-  e. tar xopf ..path_to/speech_commands_v0.01.tar 
-  f. cd ..
-  g. mkdir speechdata 
-  h. cd BDML
-  i. python create_dataset.py ../data --out_path ../speechdata
+  1. Download Speech data to this directory
+  2. gunzip speech_commands_v0.01.tar.gz
+  3. mkdir data 
+  4. cd data
+  5. tar xopf ..path_to/speech_commands_v0.01.tar 
+  6. cd ..
+  7. mkdir speechdata 
+  8. cd BDML
+  9. python create_dataset.py ../data --out_path ../speechdata
 
 ## Run the model
-  a. python run.py --train_path ../speechdata/train/ --valid_path ../speechdata/valid --test_path ../speechdata/test
+  1. python run.py --train_path ../speechdata/train/ --valid_path ../speechdata/valid --test_path ../speechdata/test
   Note: You can specify other arguments to the run.py script like batch_size, model e.t.c. You can find them all in the file itself.
 
 
 We have run this project on NYU Prince server using Slurm batch script.
 ## To run the batch script on NYU server: 
-a. sbatch runbatch.s
-Note: You can change the arguments in the runbatch.s script to run with various network configuration.
+  1. sbatch runbatch.s
+  Note: You can change the arguments in the runbatch.s script to run with various network configuration.
 
 
 
