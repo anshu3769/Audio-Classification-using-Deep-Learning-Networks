@@ -31,12 +31,14 @@ Please follow the steps to train/test a model:
 
 ## Run the model
   1. python run.py --train_path ../speechdata/train/ --valid_path ../speechdata/valid --test_path ../speechdata/test
+  
   Note: You can specify other arguments to the run.py script like batch_size, model e.t.c. You can find them all in the file itself.
 
 
 We have run this project on NYU Prince server using Slurm batch script.
 ## To run the batch script on NYU server: 
   1. sbatch runbatch.s
+  
   Note: You can change the arguments in the runbatch.s script to run with various network configuration.
 
 
