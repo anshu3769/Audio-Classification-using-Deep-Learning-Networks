@@ -6,6 +6,7 @@ import torch.optim as optim
 from data_loader import SpeechDataLoader
 import numpy as np
 from model import LeNet, VGG
+import model as model
 from train import train, test, val
 import os
 
@@ -24,7 +25,7 @@ parser.add_argument('--batch_size', type=int, default=100,
 parser.add_argument('--test_batch_size', type=int, default=100,
                     metavar='N', help='batch size for testing')
 parser.add_argument('--arc', default='LeNet',
-                    help='network architecture: LeNet, VGG11, VGG13, VGG16, VGG19')
+                    help='network architecture: LeNet, VGG11, VGG13, VGG16, VGG19, ResNet18, ResNet32')
 parser.add_argument('--input_format', default='STFT',
                     help='Input format: STFT, MEL')
 parser.add_argument('--epochs', type=int, default=100,
@@ -42,7 +43,8 @@ parser.add_argument('--log-interval', type=int, default=10, metavar='N',
                     help='num of batches to wait until logging train status')
 parser.add_argument('--patience', type=int, default=5, metavar='N',
                     help='how many epochs of no loss improvement should we wait before stop training')
-
+parser.add_argument('--loss_func', default='NLL',
+                    help='NLL, CrossEntropy')
 # feature extraction options
 parser.add_argument('--window_size', default=.02,
                     help='window size for the stft')
@@ -85,7 +87,7 @@ if args.arc == 'LeNet':
     if(args.input_format=='STFT'):
         model = LeNet(16280)
     elif(args.input_format=='MEL'):
-        model = LeNet(12760)
+        model = LeNet(9680)
 
     else:
         model = LeNet(16280)
@@ -97,12 +99,14 @@ elif args.arc.startswith('VGG'):
     
     model = VGG(args.arc, 7680)
 
+elif args.arc.startswith('ResNet'):
+    model = model.create_resnet_model(model_name=args.arc,num_classes=30, in_channels=1)
 
 else:
     if(args.input_format=='STFT'):
         model = LeNet(16280)
     elif(args.input_format=='MEL'):
-        model = LeNet(12760)
+        model = LeNet(9680)
 
     else:
         model = LeNet(16280)
@@ -119,6 +123,7 @@ if args.optimizer.lower() == 'adam':
 elif args.optimizer.lower() == 'sgd':
     optimizer = optim.SGD(model.parameters(), lr=args.lr,
                           momentum=args.momentum)
+
 else:
     optimizer = optim.SGD(model.parameters(), lr=args.lr,
                           momentum=args.momentum)
@@ -128,10 +133,11 @@ iteration = 0
 epoch = 1
 itr=0
 
+
 # training with early stopping
 while (epoch < args.epochs + 1) and (iteration < args.patience) and (itr<args.patience):
-    train(train_loader, model, optimizer, epoch, args.cuda, args.log_interval)
-    valid_loss = val(valid_loader, model, args.cuda)
+    train(train_loader, model, optimizer, epoch, args.cuda, args.log_interval, args.loss_func)
+    valid_loss = val(valid_loader, model, args.cuda,args.loss_func)
     if valid_loss > best_valid_loss:
         iteration += 1
         print('Loss was not improved, iteration {0}'.format(str(iteration)))
@@ -152,4 +158,4 @@ while (epoch < args.epochs + 1) and (iteration < args.patience) and (itr<args.pa
     epoch += 1
 
 # test model
-test(test_loader, model, args.cuda)
+test(test_loader, model, args.cuda, args.loss_func)
