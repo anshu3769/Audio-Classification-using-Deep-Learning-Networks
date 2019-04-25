@@ -25,9 +25,9 @@ parser.add_argument('--batch_size', type=int, default=100,
 parser.add_argument('--test_batch_size', type=int, default=100,
                     metavar='N', help='batch size for testing')
 parser.add_argument('--arc', default='LeNet',
-                    help='network architecture: LeNet, VGG11, VGG13, VGG16, VGG19, ResNet18, ResNet32')
+                    help='network architecture: LeNet, VGG11, VGG13, VGG16, VGG19, ResNet18, ResNet34')
 parser.add_argument('--input_format', default='STFT',
-                    help='Input format: STFT, MEL')
+                    help='Input format: STFT, MEL100, MEL32, MEL40')
 parser.add_argument('--epochs', type=int, default=100,
                     metavar='N', help='number of epochs to train')
 parser.add_argument('--lr', type=float, default=0.001,
