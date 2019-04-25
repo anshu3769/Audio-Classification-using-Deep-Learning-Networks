@@ -4,16 +4,16 @@ import torch.nn.functional as F
 import torch.utils.model_zoo as model_zoo
 
 def create_resnet_model(model_name, num_classes, in_channels):
-    if model_name == "resnet18":
+    if model_name == "ResNet18":
         #print("Create RESNET18 model")
         model = resnet18(num_classes=num_classes, in_channels=in_channels)
-    if model_name == "resnet34":
+    if model_name == "ResNet34":
         model = resnet34(num_classes=num_classes, in_channels=in_channels)
-    elif model_name == "resnet50":
+    elif model_name == "ResNet50":
         model = resnet50(num_classes=num_classes, in_channels=in_channels)
-    elif model_name == "resnet101":
+    elif model_name == "ResNet101":
         model = resnet101(num_classes=num_classes, in_channels=in_channels)
-    elif model_name == "resnet152":
+    elif model_name == "ResNet152":
         model = resnet152(num_classes=num_classes, in_channels=in_channels)
     else:
         model = resnet18(num_classes=num_classes, in_channels=in_channels)
