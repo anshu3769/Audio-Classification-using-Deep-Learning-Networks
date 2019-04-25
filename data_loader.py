@@ -12,10 +12,12 @@ AUDIO_EXTENSIONS = [
 
 
 def is_audio_file(filename):
+    """Return true if the file is an audio file"""
     return any(filename.endswith(extension) for extension in AUDIO_EXTENSIONS)
 
 
 def find_classes(dir):
+    """ Returns a tuple of class of the audio file and id associated with it"""
     classes = [d for d in os.listdir(dir) if os.path.isdir(os.path.join(dir, d))]
     classes.sort()
     class_to_idx = {classes[i]: i for i in range(len(classes))}
@@ -46,15 +48,18 @@ def spect_loader(path, window_size, window_stride, window, normalize, input_form
     win_length = n_fft
     hop_length = int(sr * window_stride)
     spect=np.array([])
-    if(input_format=="STFT"):
+	
+    # Data processing: Convert audio files to the desired format based on the given input_format 
 
-	    # STFT
+    # 1. STFT: allows one to see how different frequencies change over time.
+    if(input_format=="STFT"):
     	D = librosa.stft(y, n_fft=n_fft, hop_length=hop_length,
                      win_length=win_length, window=window)
     	spect, phase = librosa.magphase(D)
-    	# S 	= log(S+1)
+    	# S = log(S+1)
     	spect = np.log1p(spect)
-    
+	
+    #2. Mel
     if(input_format=="MEL32"):
         S=librosa.feature.melspectrogram(y, sr=sr,n_fft=n_fft, hop_length=hop_length, n_mels=32)
         spect = librosa.power_to_db(abs(S))
