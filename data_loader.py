@@ -58,8 +58,12 @@ def spect_loader(path, window_size, window_stride, window, normalize, input_form
     if(input_format=="MEL32"):
         S=librosa.feature.melspectrogram(y, sr=sr,n_fft=n_fft, hop_length=hop_length, n_mels=32)
         spect = librosa.power_to_db(abs(S))
+	
+    if(input_format=="MEL40"):
+        S=librosa.feature.melspectrogram(y, sr=sr,n_fft=n_fft, hop_length=hop_length, n_mels=40)
+        spect = librosa.power_to_db(abs(S))
 
-    if(input_format=="MEL"):
+    if(input_format=="MEL100"):
         S=librosa.feature.melspectrogram(y, sr=sr,n_fft=n_fft, hop_length=hop_length, n_mels=100)
         spect = librosa.power_to_db(abs(S))
     
