@@ -1,23 +1,29 @@
 import torch.nn as nn
 import torch.nn.functional as F
 
-
 class LeNet(nn.Module):
-    def __init__(self):
+    def __init__(self,linear_layer_dim):
         super(LeNet, self).__init__()
         self.conv1 = nn.Conv2d(1, 20, kernel_size=5)
         self.conv2 = nn.Conv2d(20, 20, kernel_size=5)
         self.conv2_drop = nn.Dropout2d()
-        self.fc1 = nn.Linear(16280, 1000)
+        self.fc1 = nn.Linear(linear_layer_dim, 1000)
         self.fc2 = nn.Linear(1000, 30)
 
     def forward(self, x):
+        
         x = F.relu(F.max_pool2d(self.conv1(x), 2))
+        
         x = F.relu(F.max_pool2d(self.conv2_drop(self.conv2(x)), 2))
+        
         x = x.view(x.size(0), -1)
+        
         x = F.relu(self.fc1(x))
+        
         x = F.dropout(x, training=self.training)
+        
         x = self.fc2(x)
+        
         return F.log_softmax(x)
 
 
@@ -45,15 +51,19 @@ cfg = {
 
 
 class VGG(nn.Module):
-    def __init__(self, vgg_name):
+    def __init__(self, vgg_name, linear_layer_dim):
         super(VGG, self).__init__()
         self.features = _make_layers(cfg[vgg_name])
-        self.fc1 = nn.Linear(7680, 512)
+        self.fc1 = nn.Linear(linear_layer_dim, 512)
         self.fc2 = nn.Linear(512, 30)
 
     def forward(self, x):
         out = self.features(x)
+        
         out = out.view(out.size(0), -1)
+        
         out = self.fc1(out)
+        
         out = self.fc2(out)
+        
         return F.log_softmax(out)

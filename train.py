@@ -15,15 +15,15 @@ def train(loader, model, optimizer, epoch, cuda, log_interval, verbose=True):
         loss = F.nll_loss(output, target)
         loss.backward()
         optimizer.step()
-        global_epoch_loss += loss.data[0]
+        global_epoch_loss += F.nll_loss(output, target, size_average=False).data
         if verbose:
             if batch_idx % log_interval == 0:
                 print('Train Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}'.format(
                     epoch, batch_idx * len(data), len(loader.dataset), 100.
-                    * batch_idx / len(loader), loss.data[0]))
+                    * batch_idx / len(loader), loss.data))
     global_epoch_loss=global_epoch_loss / len(loader.dataset)
     print('\nTrain set: Average loss: {:.4f}\n'.format(
-            test_loss))
+            global_epoch_loss))
     return global_epoch_loss
 
 
@@ -36,7 +36,7 @@ def test(loader, model, cuda, verbose=True):
             data, target = data.cuda(), target.cuda()
         data, target = Variable(data, volatile=True), Variable(target)
         output = model(data)
-        test_loss += F.nll_loss(output, target, size_average=False).data[0]  # sum up batch loss
+        test_loss += F.nll_loss(output, target, size_average=False).data  # sum up batch loss
         pred = output.data.max(1, keepdim=True)[1]  # get the index of the max log-probability
         correct += pred.eq(target.data.view_as(pred)).cpu().sum()
 
@@ -55,7 +55,7 @@ def val(loader, model, cuda, verbose=True):
             data, target = data.cuda(), target.cuda()
         data, target = Variable(data, volatile=True), Variable(target)
         output = model(data)
-        test_loss += F.nll_loss(output, target, size_average=False).data[0]  # sum up batch loss
+        test_loss += F.nll_loss(output, target, size_average=False).data  # sum up batch loss
         pred = output.data.max(1, keepdim=True)[1]  # get the index of the max log-probability
         correct += pred.eq(target.data.view_as(pred)).cpu().sum()
 

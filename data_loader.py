@@ -39,27 +39,37 @@ def make_dataset(dir, class_to_idx):
     return spects
 
 
-def spect_loader(path, window_size, window_stride, window, normalize, max_len=101):
+def spect_loader(path, window_size, window_stride, window, normalize, input_format,  max_len=101):
     y, sr = librosa.load(path, sr=None)
     # n_fft = 4096
     n_fft = int(sr * window_size)
     win_length = n_fft
     hop_length = int(sr * window_stride)
+    spect=np.array([])
+    if(input_format=="STFT"):
 
-    # STFT
-    D = librosa.stft(y, n_fft=n_fft, hop_length=hop_length,
+	    # STFT
+    	D = librosa.stft(y, n_fft=n_fft, hop_length=hop_length,
                      win_length=win_length, window=window)
-    spect, phase = librosa.magphase(D)
+    	spect, phase = librosa.magphase(D)
+    	# S 	= log(S+1)
+    	spect = np.log1p(spect)
+    
+    if(input_format=="MEL"):
+        S=librosa.feature.melspectrogram(y, sr=sr,n_fft=n_fft, hop_length=hop_length)
+        spect = librosa.power_to_db(abs(S))
+    
+    
 
-    # S = log(S+1)
-    spect = np.log1p(spect)
-
+    
     # make all spects with the same dims
     # TODO: change that in the future
     if spect.shape[1] < max_len:
+        
         pad = np.zeros((spect.shape[0], max_len - spect.shape[1]))
         spect = np.hstack((spect, pad))
     elif spect.shape[1] > max_len:
+        
         spect = spect[:, :max_len]
     spect = np.resize(spect, (1, spect.shape[0], spect.shape[1]))
     spect = torch.FloatTensor(spect)
@@ -101,7 +111,7 @@ class SpeechDataLoader(data.Dataset):
         STFT parameter: window_size, window_stride, window_type, normalize
     """
 
-    def __init__(self, root, transform=None, target_transform=None, window_size=.02,
+    def __init__(self, root, input_format,  transform=None, target_transform=None, window_size=.02,
                  window_stride=.01, window_type='hamming', normalize=True, max_len=101):
         classes, class_to_idx = find_classes(root)
         spects = make_dataset(root, class_to_idx)
@@ -120,6 +130,7 @@ class SpeechDataLoader(data.Dataset):
         self.window_type = window_type
         self.normalize = normalize
         self.max_len = max_len
+        self.input_format=input_format
 
     def __getitem__(self, index):
         """
@@ -129,7 +140,7 @@ class SpeechDataLoader(data.Dataset):
             tuple: (spect, target) where target is class_index of the target class.
         """
         path, target = self.spects[index]
-        spect = self.loader(path, self.window_size, self.window_stride, self.window_type, self.normalize, self.max_len)
+        spect = self.loader(path, self.window_size, self.window_stride, self.window_type, self.normalize, self.input_format,  self.max_len)
         if self.transform is not None:
             spect = self.transform(spect)
         if self.target_transform is not None:

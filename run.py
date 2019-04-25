@@ -1,3 +1,4 @@
+
 from __future__ import print_function
 import argparse
 import torch
@@ -12,11 +13,11 @@ import os
 # Training settings
 parser = argparse.ArgumentParser(
     description='ConvNets for Speech Commands Recognition')
-parser.add_argument('--train_path', default='gcommands/train',
+parser.add_argument('--train_path', default='/train',
                     help='path to the train data folder')
-parser.add_argument('--test_path', default='gcommands/test',
+parser.add_argument('--test_path', default='/test',
                     help='path to the test data folder')
-parser.add_argument('--valid_path', default='gcommands/valid',
+parser.add_argument('--valid_path', default='/valid',
                     help='path to the valid data folder')
 parser.add_argument('--batch_size', type=int, default=100,
                     metavar='N', help='training and valid batch size')
@@ -24,6 +25,8 @@ parser.add_argument('--test_batch_size', type=int, default=100,
                     metavar='N', help='batch size for testing')
 parser.add_argument('--arc', default='LeNet',
                     help='network architecture: LeNet, VGG11, VGG13, VGG16, VGG19')
+parser.add_argument('--input_format', default='STFT',
+                    help='Input format: STFT, MEL')
 parser.add_argument('--epochs', type=int, default=100,
                     metavar='N', help='number of epochs to train')
 parser.add_argument('--lr', type=float, default=0.001,
@@ -51,26 +54,27 @@ parser.add_argument('--normalize', default=True,
                     help='boolean, wheather or not to normalize the spect')
 
 args = parser.parse_args()
-
+print(args)
 args.cuda = args.cuda and torch.cuda.is_available()
 torch.manual_seed(args.seed)
 if args.cuda:
     torch.cuda.manual_seed(args.seed)
 
+
 # loading data
-train_dataset = SpeechDataLoader(args.train_path, window_size=args.window_size, window_stride=args.window_stride,
+train_dataset = SpeechDataLoader(args.train_path, args.input_format, window_size=args.window_size, window_stride=args.window_stride,
                                window_type=args.window_type, normalize=args.normalize)
 train_loader = torch.utils.data.DataLoader(
     train_dataset, batch_size=args.batch_size, shuffle=True,
     num_workers=20, pin_memory=args.cuda, sampler=None)
 
-valid_dataset = SpeechDataLoader(args.valid_path, window_size=args.window_size, window_stride=args.window_stride,
+valid_dataset = SpeechDataLoader(args.valid_path, args.input_format, window_size=args.window_size, window_stride=args.window_stride,
                                window_type=args.window_type, normalize=args.normalize)
 valid_loader = torch.utils.data.DataLoader(
     valid_dataset, batch_size=args.batch_size, shuffle=None,
     num_workers=20, pin_memory=args.cuda, sampler=None)
 
-test_dataset = SpeechDataLoader(args.test_path, window_size=args.window_size, window_stride=args.window_stride,
+test_dataset = SpeechDataLoader(args.test_path,args.input_format, window_size=args.window_size, window_stride=args.window_stride,
                               window_type=args.window_type, normalize=args.normalize)
 test_loader = torch.utils.data.DataLoader(
     test_dataset, batch_size=args.test_batch_size, shuffle=None,
@@ -78,11 +82,32 @@ test_loader = torch.utils.data.DataLoader(
 
 # build model
 if args.arc == 'LeNet':
-    model = LeNet()
+    if(args.input_format=='STFT'):
+        model = LeNet(16280)
+    elif(args.input_format=='MEL'):
+        model = LeNet(12760)
+
+    else:
+        model = LeNet(16280)
+
+
+    
+    
 elif args.arc.startswith('VGG'):
-    model = VGG(args.arc)
+    
+    model = VGG(args.arc, 7680)
+
+
 else:
-    model = LeNet()
+    if(args.input_format=='STFT'):
+        model = LeNet(16280)
+    elif(args.input_format=='MEL'):
+        model = LeNet(12760)
+
+    else:
+        model = LeNet(16280)
+
+
 
 if args.cuda:
     print('Using CUDA with {0} GPUs'.format(torch.cuda.device_count()))
@@ -101,15 +126,17 @@ else:
 best_valid_loss = np.inf
 iteration = 0
 epoch = 1
-
+itr=0
 
 # training with early stopping
-while (epoch < args.epochs + 1) and (iteration < args.patience):
+while (epoch < args.epochs + 1) and (iteration < args.patience) and (itr<args.patience):
     train(train_loader, model, optimizer, epoch, args.cuda, args.log_interval)
     valid_loss = val(valid_loader, model, args.cuda)
     if valid_loss > best_valid_loss:
         iteration += 1
         print('Loss was not improved, iteration {0}'.format(str(iteration)))
+        if(iteration==1):
+            itr+=1
     else:
         print('Saving model...')
         iteration = 0
