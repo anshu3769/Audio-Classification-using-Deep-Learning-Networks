@@ -1,7 +1,6 @@
 import torch.nn as nn
 import torch.nn.functional as F
 
-
 class LeNet(nn.Module):
     def __init__(self,linear_layer_dim):
         super(LeNet, self).__init__()

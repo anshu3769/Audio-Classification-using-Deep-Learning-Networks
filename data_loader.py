@@ -49,33 +49,27 @@ def spect_loader(path, window_size, window_stride, window, normalize, input_form
     if(input_format=="STFT"):
 
 	    # STFT
-    
     	D = librosa.stft(y, n_fft=n_fft, hop_length=hop_length,
                      win_length=win_length, window=window)
     	spect, phase = librosa.magphase(D)
-
     	# S 	= log(S+1)
     	spect = np.log1p(spect)
     
     if(input_format=="MEL"):
         S=librosa.feature.melspectrogram(y, sr=sr,n_fft=n_fft, hop_length=hop_length)
-        spect = S
-    if(input_format=="MFCC"):
-        
-        mfcc = librosa.feature.mfcc(y, sr=sr)
-
-
-        spect = mfcc
-
+        spect = librosa.power_to_db(abs(S))
     
     
+
     
     # make all spects with the same dims
     # TODO: change that in the future
     if spect.shape[1] < max_len:
+        
         pad = np.zeros((spect.shape[0], max_len - spect.shape[1]))
         spect = np.hstack((spect, pad))
     elif spect.shape[1] > max_len:
+        
         spect = spect[:, :max_len]
     spect = np.resize(spect, (1, spect.shape[0], spect.shape[1]))
     spect = torch.FloatTensor(spect)

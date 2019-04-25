@@ -13,11 +13,11 @@ import os
 # Training settings
 parser = argparse.ArgumentParser(
     description='ConvNets for Speech Commands Recognition')
-parser.add_argument('--train_path', default='gcommands/train',
+parser.add_argument('--train_path', default='/train',
                     help='path to the train data folder')
-parser.add_argument('--test_path', default='gcommands/test',
+parser.add_argument('--test_path', default='/test',
                     help='path to the test data folder')
-parser.add_argument('--valid_path', default='gcommands/valid',
+parser.add_argument('--valid_path', default='/valid',
                     help='path to the valid data folder')
 parser.add_argument('--batch_size', type=int, default=100,
                     metavar='N', help='training and valid batch size')
@@ -26,7 +26,7 @@ parser.add_argument('--test_batch_size', type=int, default=100,
 parser.add_argument('--arc', default='LeNet',
                     help='network architecture: LeNet, VGG11, VGG13, VGG16, VGG19')
 parser.add_argument('--input_format', default='STFT',
-                    help='Input format: STFT, MEL, MFCC, RAW')
+                    help='Input format: STFT, MEL')
 parser.add_argument('--epochs', type=int, default=100,
                     metavar='N', help='number of epochs to train')
 parser.add_argument('--lr', type=float, default=0.001,
@@ -86,8 +86,7 @@ if args.arc == 'LeNet':
         model = LeNet(16280)
     elif(args.input_format=='MEL'):
         model = LeNet(12760)
-    elif(args.input_format=='MFCC'):
-        model = LeNet(880)
+
     else:
         model = LeNet(16280)
 
@@ -99,14 +98,12 @@ elif args.arc.startswith('VGG'):
     model = VGG(args.arc, 7680)
 
 
-
 else:
     if(args.input_format=='STFT'):
         model = LeNet(16280)
     elif(args.input_format=='MEL'):
         model = LeNet(12760)
-    elif(args.input_format=='MFCC'):
-        model = LeNet(880)
+
     else:
         model = LeNet(16280)
 
