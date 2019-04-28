@@ -54,6 +54,8 @@ parser.add_argument('--window_type', default='hamming',
                     help='window type for the stft')
 parser.add_argument('--normalize', default=True,
                     help='boolean, wheather or not to normalize the spect')
+parser.add_argument('--datacleaning', default=False,
+                    help='boolean, removes the data with negligible values')
 
 args = parser.parse_args()
 print(args)
@@ -64,18 +66,33 @@ if args.cuda:
 
 
 # loading data
-train_dataset = SpeechDataLoader(args.train_path, args.input_format, window_size=args.window_size, window_stride=args.window_stride,
+if args.datacleaning:
+    train_dataset = SpeechDataLoader(args.train_path, args.input_format, window_size=args.window_size, window_stride=args.window_stride,
+                               window_type=args.window_type, normalize=args.normalizei, max_len=70)
+else:
+    train_dataset = SpeechDataLoader(args.train_path, args.input_format, window_size=args.window_size, window_stride=args.window_stride,
                                window_type=args.window_type, normalize=args.normalize)
+
 train_loader = torch.utils.data.DataLoader(
     train_dataset, batch_size=args.batch_size, shuffle=True,
     num_workers=20, pin_memory=args.cuda, sampler=None)
 
-valid_dataset = SpeechDataLoader(args.valid_path, args.input_format, window_size=args.window_size, window_stride=args.window_stride,
+if args.datacleaning:
+    valid_dataset = SpeechDataLoader(args.valid_path, args.input_format, window_size=args.window_size, window_stride=args.window_stride,
+                               window_type=args.window_type, normalize=args.normalize, max_len=70)
+else:
+    valid_dataset = SpeechDataLoader(args.valid_path, args.input_format, window_size=args.window_size, window_stride=args.window_stride,
                                window_type=args.window_type, normalize=args.normalize)
+
+
 valid_loader = torch.utils.data.DataLoader(
     valid_dataset, batch_size=args.batch_size, shuffle=None,
     num_workers=20, pin_memory=args.cuda, sampler=None)
 
+if args.datacleaning:
+test_dataset = SpeechDataLoader(args.test_path,args.input_format, window_size=args.window_size, window_stride=args.window_stride,
+                              window_type=args.window_type, normalize=args.normalize, max_len=70)
+else:
 test_dataset = SpeechDataLoader(args.test_path,args.input_format, window_size=args.window_size, window_stride=args.window_stride,
                               window_type=args.window_type, normalize=args.normalize)
 test_loader = torch.utils.data.DataLoader(
@@ -93,10 +110,7 @@ if args.arc == 'LeNet':
         model = LeNet(16280)
 
 
-    
-    
 elif args.arc.startswith('VGG'):
-    
     model = VGG(args.arc, 7680)
 
 elif args.arc.startswith('ResNet'):

@@ -51,9 +51,7 @@ def cleanData(y):
   return np.array(y_new)
 
 
-
-
-def spect_loader(path, window_size, window_stride, window, normalize, input_format,  max_len=70):
+def spect_loader(path, window_size, window_stride, window, normalize, input_format,  max_len=101):
     y, sr = librosa.load(path, sr=None)
     # n_fft = 4096
     n_fft = int(sr * window_size)
@@ -140,7 +138,7 @@ class SpeechDataLoader(data.Dataset):
     """
 
     def __init__(self, root, input_format,  transform=None, target_transform=None, window_size=.02,
-                 window_stride=.01, window_type='hamming', normalize=True, max_len=70):
+                 window_stride=.01, window_type='hamming', normalize=True, max_len=101):
         classes, class_to_idx = find_classes(root)
         spects = make_dataset(root, class_to_idx)
         if len(spects) == 0:
