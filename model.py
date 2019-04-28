@@ -3,20 +3,20 @@ import torch.nn as nn
 import torch.nn.functional as F
 import torch.utils.model_zoo as model_zoo
 
-def create_resnet_model(model_name, num_classes, in_channels):
+def create_resnet_model(model_name, num_classes, in_channels, last_layer_dim):
     if model_name == "ResNet18":
         #print("Create RESNET18 model")
-        model = resnet18(num_classes=num_classes, in_channels=in_channels)
+        model = resnet18(num_classes=num_classes, in_channels=in_channels, last_layer_dim=last_layer_dim)
     if model_name == "ResNet34":
-        model = resnet34(num_classes=num_classes, in_channels=in_channels)
+        model = resnet34(num_classes=num_classes, in_channels=in_channels, last_layer_dim=last_layer_dim)
     elif model_name == "ResNet50":
-        model = resnet50(num_classes=num_classes, in_channels=in_channels)
+        model = resnet50(num_classes=num_classes, in_channels=in_channels, last_layer_dim=last_layer_dim)
     elif model_name == "ResNet101":
-        model = resnet101(num_classes=num_classes, in_channels=in_channels)
+        model = resnet101(num_classes=num_classes, in_channels=in_channels, last_layer_dim=last_layer_dim)
     elif model_name == "ResNet152":
-        model = resnet152(num_classes=num_classes, in_channels=in_channels)
+        model = resnet152(num_classes=num_classes, in_channels=in_channels, last_layer_dim=last_layer_dim)
     else:
-        model = resnet18(num_classes=num_classes, in_channels=in_channels)
+        model = resnet18(num_classes=num_classes, in_channels=in_channels, last_layer_dim=last_layer_dim)
     return model
 
 
@@ -105,7 +105,7 @@ class Bottleneck(nn.Module):
 
 class ResNet(nn.Module):
 
-    def __init__(self, block, layers, num_classes=1000, in_channels=3):
+    def __init__(self, block, layers, num_classes=1000, in_channels=3, last_layer_dim=2048):
         self.inplanes = 64
         super(ResNet, self).__init__()
         self.conv1 = nn.Conv2d(in_channels, 64, kernel_size=7, stride=2, padding=3,
@@ -118,7 +118,7 @@ class ResNet(nn.Module):
         self.layer3 = self._make_layer(block, 256, layers[2], stride=2)
         self.layer4 = self._make_layer(block, 512, layers[3], stride=2)
         self.avgpool = nn.AvgPool2d(1, stride=1)
-        self.fc = nn.Linear(2048 * block.expansion, 512)
+        self.fc = nn.Linear(last_layer_dim * block.expansion, 512)
         self.fc1=nn.Linear(512,num_classes)
         #print("RESNET CONST expansion = ", block.expansion)
         #print("RESNET CONST num_classes = ", num_classes)
