@@ -22,7 +22,7 @@ Please follow the steps to train/test a model:
   1. Download Speech data to this directory  <br />
      wget "http://download.tensorflow.org/data/speech_commands_v0.01.tar.gz"
   2. gunzip speech_commands_v0.01.tar.gz
-  3. mkdir data 
+  3. mkdir data; mv speech_commands_v0.01.tar data
   4. cd data
   5. tar xopf ..path_to/speech_commands_v0.01.tar 
   6. cd ..
