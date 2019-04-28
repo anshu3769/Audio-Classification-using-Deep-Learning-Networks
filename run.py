@@ -100,7 +100,10 @@ elif args.arc.startswith('VGG'):
     model = VGG(args.arc, 7680)
 
 elif args.arc.startswith('ResNet'):
-    model = model.create_resnet_model(model_name=args.arc,num_classes=30, in_channels=1)
+    if((args.input_format=='MEL32')
+        model = model.create_resnet_model(model_name=args.arc,num_classes=30, in_channels=1, last_layer_dim=2048)
+    else:
+        model = model.create_resnet_model(model_name=args.arc,num_classes=30, in_channels=1, last_layer_dim=4096)
 
 else:
     if(args.input_format=='STFT'):
