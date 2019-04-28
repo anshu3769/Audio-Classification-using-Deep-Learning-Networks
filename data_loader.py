@@ -41,6 +41,19 @@ def make_dataset(dir, class_to_idx):
     return spects
 
 
+def cleanData(y):
+  """ Remove the points from the raw audio array have negligible values""" 
+  y_new = []
+  data_array_len = 7000  # Fic the length for each input data. Will be useful for training RNN
+  for i in range(len(y)):
+    if  -0.005  > y[i]  or 0.005 < y[i]: 
+      y_new.append(y[i])
+
+  y_new.extend([float(0)] * (data_array_len - len(y_new)))
+      
+  return np.array(y_new)
+
+
 def spect_loader(path, window_size, window_stride, window, normalize, input_format,  max_len=101):
     y, sr = librosa.load(path, sr=None)
     # n_fft = 4096
@@ -49,6 +62,10 @@ def spect_loader(path, window_size, window_stride, window, normalize, input_form
     hop_length = int(sr * window_stride)
     spect=np.array([])
 	
+
+    # Clean the input
+    y = cleanData(y)
+
     # Data processing: Convert audio files to the desired format based on the given input_format 
 
     # 1. STFT: allows one to see how different frequencies change over time.

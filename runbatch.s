@@ -12,4 +12,4 @@
 
 module load anaconda3/5.3.1
 source activate bdml
-python run.py --train_path ../speechdata/train/ --valid_path ../speechdata/valid/ --test_path ../speechdata/test/ --arc VGG11
+python run.py --datacleaning true --train_path ../speechdata/train/ --valid_path ../speechdata/valid/ --test_path ../speechdata/test/ --arc VGG11
