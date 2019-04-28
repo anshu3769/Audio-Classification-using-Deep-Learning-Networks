@@ -19,7 +19,7 @@ Please follow the steps to train/test a model:
   6. source activate bdml
   
 ## Load the dataset
-  1. Download Speech data to this directory
+  1. Download Speech data to this directory \n
      wget "http://download.tensorflow.org/data/speech_commands_v0.01.tar.gz"
   2. gunzip speech_commands_v0.01.tar.gz
   3. mkdir data 
