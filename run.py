@@ -111,7 +111,10 @@ if args.arc == 'LeNet':
 
 
 elif args.arc.startswith('VGG'):
-    model = VGG(args.arc, 7680)
+    if args.datacleaning:
+        model = VGG(args.arc, 5120)
+    else:
+        model = VGG(args.arc, 7680)
 
 elif args.arc.startswith('ResNet'):
     if(args.input_format=='MEL32'):
