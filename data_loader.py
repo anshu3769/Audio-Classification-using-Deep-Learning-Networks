@@ -41,7 +41,19 @@ def make_dataset(dir, class_to_idx):
     return spects
 
 
-def spect_loader(path, window_size, window_stride, window, normalize, input_format,  max_len=101):
+def cleanData(y):
+  """ Remove the points from the raw audio array have negligible values""" 
+  y_new = []
+  for i in range(len(y)):
+    if  -0.0009  > y[i]  or 0.0009 < y[i]: 
+      y_new.append(y[i])
+      
+  return np.array(y_new)
+
+
+
+
+def spect_loader(path, window_size, window_stride, window, normalize, input_format,  max_len=70):
     y, sr = librosa.load(path, sr=None)
     # n_fft = 4096
     n_fft = int(sr * window_size)
@@ -49,6 +61,10 @@ def spect_loader(path, window_size, window_stride, window, normalize, input_form
     hop_length = int(sr * window_stride)
     spect=np.array([])
 	
+
+    # Clean the input
+    y = cleanData(y)
+
     # Data processing: Convert audio files to the desired format based on the given input_format 
 
     # 1. STFT: allows one to see how different frequencies change over time.
@@ -124,7 +140,7 @@ class SpeechDataLoader(data.Dataset):
     """
 
     def __init__(self, root, input_format,  transform=None, target_transform=None, window_size=.02,
-                 window_stride=.01, window_type='hamming', normalize=True, max_len=101):
+                 window_stride=.01, window_type='hamming', normalize=True, max_len=70):
         classes, class_to_idx = find_classes(root)
         spects = make_dataset(root, class_to_idx)
         if len(spects) == 0:
