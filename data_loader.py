@@ -44,12 +44,12 @@ def make_dataset(dir, class_to_idx):
 def cleanData(y):
   """ Remove the points from the raw audio array have negligible values""" 
   y_new = []
-  data_array_len = 9000  # Fic the length for each input data. Will be useful for training RNN
+  data_array_len = 7000  # Fic the length for each input data. Will be useful for training RNN
   for i in range(len(y)):
-    if  -0.0009  > y[i]  or 0.0009 < y[i]: 
+    if  -0.005  > y[i]  or 0.005 < y[i]: 
       y_new.append(y[i])
 
-  y_new.extend([0] * (data_array_len - len(y_new)))
+  y_new.extend([float(0)] * (data_array_len - len(y_new)))
       
   return np.array(y_new)
 
