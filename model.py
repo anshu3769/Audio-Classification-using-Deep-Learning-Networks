@@ -237,6 +237,19 @@ def _make_layers(cfg):
     layers += [nn.AvgPool2d(kernel_size=1, stride=1)]
     return nn.Sequential(*layers)
 
+
+class CNNRNN(nn.Module):
+    def __init__(self,linear_layer_dim):
+        super(CNNRNN, self).__init__()
+            
+        self.conv1 = nn.Conv2d(1, 16, kernel_size=5)
+        self.bn1 = nn.BatchNorm2d(16)
+        self.conv1_drop = nn.Dropout2d(p=0.1)
+           
+        self.conv2 = nn.Conv2d(16, 32, kernel_size=5)
+        self.bn2 = nn.BatchNorm2d(32)
+        self.conv2_drop = nn.Dropout2d(p=0.15)
+
 class LeNet(nn.Module):
     def __init__(self,linear_layer_dim):
         super(LeNet, self).__init__()

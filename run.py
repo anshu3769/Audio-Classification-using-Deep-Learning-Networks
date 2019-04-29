@@ -25,9 +25,9 @@ parser.add_argument('--batch_size', type=int, default=100,
 parser.add_argument('--test_batch_size', type=int, default=100,
                     metavar='N', help='batch size for testing')
 parser.add_argument('--arc', default='LeNet',
-                    help='network architecture: LeNet, VGG11, VGG13, VGG16, VGG19, ResNet18, ResNet34')
+                    help='network architecture: LeNet, VGG11, VGG13, VGG16, VGG19, ResNet18, ResNet34, CNNRNN')
 parser.add_argument('--input_format', default='STFT',
-                    help='Input format: STFT, MEL100, MEL32, MEL40')
+                    help='Input format: STFT, MEL100, MEL32, MEL40, MEL128')
 parser.add_argument('--epochs', type=int, default=100,
                     metavar='N', help='number of epochs to train')
 parser.add_argument('--lr', type=float, default=0.001,
@@ -109,6 +109,18 @@ if args.arc == 'LeNet':
     else:
         model = LeNet(16280)
 
+elif args.arc == 'CNNRNN':
+    if args.datacleaning:
+        if(args.input_format=='MEL100'):
+            model = CNNRNN(16280)
+        elif(args.input_format=='MEL128'):
+            model = CNNRNN(9680)
+    else:
+        if(args.input_format=='MEL100'):
+            model = CNNRNN(16280)
+        elif(args.input_format=='MEL128'):
+            model = CNNRNN(9680)
+
 
 elif args.arc.startswith('VGG'):
     if args.datacleaning:
@@ -117,9 +129,10 @@ elif args.arc.startswith('VGG'):
         model = VGG(args.arc, 7680)
 
 elif args.arc.startswith('ResNet'):
+    
     if(args.input_format=='MEL32'):
         model = model.create_resnet_model(model_name=args.arc,num_classes=30, in_channels=1, last_layer_dim=2048)
-    else:
+    elif(args.input_format=='MEL40'):
         model = model.create_resnet_model(model_name=args.arc,num_classes=30, in_channels=1, last_layer_dim=4096)
 
 else:
