@@ -79,7 +79,7 @@ train_loader = torch.utils.data.DataLoader(
 
 if args.datacleaning:
     valid_dataset = SpeechDataLoader(args.valid_path, args.input_format, window_size=args.window_size, window_stride=args.window_stride,
-                               window_type=args.window_type, normalize=args.normalize, max_len=70)
+                               window_type=args.window_type, normalize=args.normalize, max_len=70, clean_data=args.datacleaning)
 else:
     valid_dataset = SpeechDataLoader(args.valid_path, args.input_format, window_size=args.window_size, window_stride=args.window_stride,
                                window_type=args.window_type, normalize=args.normalize)
@@ -91,7 +91,7 @@ valid_loader = torch.utils.data.DataLoader(
 
 if args.datacleaning:
 test_dataset = SpeechDataLoader(args.test_path,args.input_format, window_size=args.window_size, window_stride=args.window_stride,
-                              window_type=args.window_type, normalize=args.normalize, max_len=70)
+                              window_type=args.window_type, normalize=args.normalize, max_len=70, clean_data=args.datacleaning)
 else:
 test_dataset = SpeechDataLoader(args.test_path,args.input_format, window_size=args.window_size, window_stride=args.window_stride,
                               window_type=args.window_type, normalize=args.normalize)
