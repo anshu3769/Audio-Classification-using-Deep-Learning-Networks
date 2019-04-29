@@ -68,7 +68,7 @@ if args.cuda:
 # loading data
 if args.datacleaning:
     train_dataset = SpeechDataLoader(args.train_path, args.input_format, window_size=args.window_size, window_stride=args.window_stride,
-                               window_type=args.window_type, normalize=args.normalizei, max_len=70)
+                               window_type=args.window_type, normalize=args.normalize, max_len=70, clean_data=args.datacleaning)
 else:
     train_dataset = SpeechDataLoader(args.train_path, args.input_format, window_size=args.window_size, window_stride=args.window_stride,
                                window_type=args.window_type, normalize=args.normalize)
@@ -90,10 +90,10 @@ valid_loader = torch.utils.data.DataLoader(
     num_workers=20, pin_memory=args.cuda, sampler=None)
 
 if args.datacleaning:
-test_dataset = SpeechDataLoader(args.test_path,args.input_format, window_size=args.window_size, window_stride=args.window_stride,
+    test_dataset = SpeechDataLoader(args.test_path,args.input_format, window_size=args.window_size, window_stride=args.window_stride,
                               window_type=args.window_type, normalize=args.normalize, max_len=70, clean_data=args.datacleaning)
 else:
-test_dataset = SpeechDataLoader(args.test_path,args.input_format, window_size=args.window_size, window_stride=args.window_stride,
+    test_dataset = SpeechDataLoader(args.test_path,args.input_format, window_size=args.window_size, window_stride=args.window_stride,
                               window_type=args.window_type, normalize=args.normalize)
 test_loader = torch.utils.data.DataLoader(
     test_dataset, batch_size=args.test_batch_size, shuffle=None,

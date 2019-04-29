@@ -54,7 +54,7 @@ def cleanData(y):
   return np.array(y_new)
 
 
-def spect_loader(path, window_size, window_stride, window, normalize, input_format,  max_len=101):
+def spect_loader(path, window_size, window_stride, window, normalize, input_format,  max_len=101, clean_data=False):
     y, sr = librosa.load(path, sr=None)
     # n_fft = 4096
     n_fft = int(sr * window_size)
@@ -64,7 +64,8 @@ def spect_loader(path, window_size, window_stride, window, normalize, input_form
 	
 
     # Clean the input
-    y = cleanData(y)
+    if(clean_data):
+        y = cleanData(y)
 
     # Data processing: Convert audio files to the desired format based on the given input_format 
 
@@ -141,7 +142,7 @@ class SpeechDataLoader(data.Dataset):
     """
 
     def __init__(self, root, input_format,  transform=None, target_transform=None, window_size=.02,
-                 window_stride=.01, window_type='hamming', normalize=True, max_len=101):
+                 window_stride=.01, window_type='hamming', normalize=True, max_len=101, clean_data=False):
         classes, class_to_idx = find_classes(root)
         spects = make_dataset(root, class_to_idx)
         if len(spects) == 0:
@@ -160,6 +161,7 @@ class SpeechDataLoader(data.Dataset):
         self.normalize = normalize
         self.max_len = max_len
         self.input_format=input_format
+        self.clean_data=clean_data
 
     def __getitem__(self, index):
         """
@@ -169,7 +171,7 @@ class SpeechDataLoader(data.Dataset):
             tuple: (spect, target) where target is class_index of the target class.
         """
         path, target = self.spects[index]
-        spect = self.loader(path, self.window_size, self.window_stride, self.window_type, self.normalize, self.input_format,  self.max_len)
+        spect = self.loader(path, self.window_size, self.window_stride, self.window_type, self.normalize, self.input_format,  self.max_len, self.clean_data)
         if self.transform is not None:
             spect = self.transform(spect)
         if self.target_transform is not None:
