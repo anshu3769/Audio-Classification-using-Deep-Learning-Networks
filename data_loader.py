@@ -90,6 +90,21 @@ def spect_loader(path, window_size, window_stride, window, normalize, input_form
         S=librosa.feature.melspectrogram(y, sr=sr,n_fft=n_fft, hop_length=hop_length, n_mels=100)
         spect = librosa.power_to_db(abs(S))
     
+    if(input_format=="RAW"):
+        max_len = 16000
+        spect = y
+        if spect.shape[0] < max_len:
+        
+            pad = np.zeros((max_len - spect.shape[0]))
+            spect = np.hstack((spect, pad))
+        elif spect.shape[0] > max_len:
+    
+            spect = spect[:, :max_len]
+        spect = np.resize(spect, (1, spect.shape[0]))
+        spect = torch.FloatTensor(spect)
+
+        return spect
+    
 
     
     # make all spects with the same dims

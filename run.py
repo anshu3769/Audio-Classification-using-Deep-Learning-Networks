@@ -5,7 +5,7 @@ import torch
 import torch.optim as optim
 from data_loader import SpeechDataLoader
 import numpy as np
-from model import LeNet, VGG
+from model import LeNet, VGG, CNN1DRNN
 import model as model
 from train import train, test, val
 import os
@@ -41,6 +41,8 @@ parser.add_argument('--seed', type=int, default=1234,
                     metavar='S', help='random seed')
 parser.add_argument('--log-interval', type=int, default=10, metavar='N',
                     help='num of batches to wait until logging train status')
+parser.add_argument('--max_len', type=int, default=101, metavar='N',
+                    help='Max len for spectrogram')
 parser.add_argument('--patience', type=int, default=5, metavar='N',
                     help='how many epochs of no loss improvement should we wait before stop training')
 parser.add_argument('--loss_func', default='NLL',
@@ -121,6 +123,8 @@ elif args.arc.startswith('ResNet'):
         model = model.create_resnet_model(model_name=args.arc,num_classes=30, in_channels=1, last_layer_dim=2048)
     else:
         model = model.create_resnet_model(model_name=args.arc,num_classes=30, in_channels=1, last_layer_dim=4096)
+elif args.arc == 'CNN1DRNN':
+    model = CNN1DRNN()
 
 else:
     if(args.input_format=='STFT'):
