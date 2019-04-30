@@ -239,16 +239,55 @@ def _make_layers(cfg):
 
 
 class CNNRNN(nn.Module):
-    def __init__(self,linear_layer_dim):
+    def __init__(self):
         super(CNNRNN, self).__init__()
-            
-        self.conv1 = nn.Conv2d(1, 16, kernel_size=5)
-        self.bn1 = nn.BatchNorm2d(16)
+        
+        self.conv1 = nn.Conv2d(1, 32, kernel_size=3)
+        self.bn1 = nn.BatchNorm2d(32)
         self.conv1_drop = nn.Dropout2d(p=0.1)
-           
-        self.conv2 = nn.Conv2d(16, 32, kernel_size=5)
-        self.bn2 = nn.BatchNorm2d(32)
+        
+        self.conv2 = nn.Conv2d(32, 64, kernel_size=3)
+        self.bn2 = nn.BatchNorm2d(64)
         self.conv2_drop = nn.Dropout2d(p=0.15)
+        
+        self.conv3 = nn.Conv2d(64, 64, kernel_size=3)
+        self.bn3 = nn.BatchNorm2d(64)
+        self.conv3_drop = nn.Dropout2d(p=0.2)
+        
+        self.rnn = nn.LSTM(128, 64, 1, batch_first=True, bidirectional=True)
+        
+        self.fc1 = nn.Linear(128,30)
+        self.fc1_drop = nn.Dropout(p=0.3)
+    
+    def forward(self, x):
+        #print(x.shape)
+        x = F.max_pool2d(self.bn1(self.conv1_drop(F.relu(self.conv1(x)))),3)
+        #print(x.shape)
+        x = F.max_pool2d(self.bn2(self.conv2_drop(F.relu(self.conv2(x)))), 4)
+        #print(x.shape)
+        x = F.max_pool2d(self.bn3(self.conv3_drop(F.relu(self.conv3(x)))), 4)
+        #print(x.shape)
+        # xt -> (batch, time, freq, channel)
+        x = x.transpose(1, -1)
+        #print(x.shape)
+        # xt -> (batch, time, channel*freq)
+        batch, time = x.size()[:2]
+        x = x.reshape(batch, time, -1)
+        #print(x.shape)
+        
+        x, hidden = self.rnn(x)
+        
+        #print(x.shape)
+        x=x.squeeze()
+        #print(x.shape)
+        x = F.relu(self.fc1_drop(self.fc1(x)))
+        #print(x.shape)
+        return F.log_softmax(x, dim=1)
+
+
+
+    
+
 
 class LeNet(nn.Module):
     def __init__(self,linear_layer_dim):

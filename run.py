@@ -5,7 +5,7 @@ import torch
 import torch.optim as optim
 from data_loader import SpeechDataLoader
 import numpy as np
-from model import LeNet, VGG
+from model import LeNet, VGG, CNNRNN
 import model as model
 from train import train, test, val
 import os
@@ -27,7 +27,7 @@ parser.add_argument('--test_batch_size', type=int, default=100,
 parser.add_argument('--arc', default='LeNet',
                     help='network architecture: LeNet, VGG11, VGG13, VGG16, VGG19, ResNet18, ResNet34, CNNRNN')
 parser.add_argument('--input_format', default='STFT',
-                    help='Input format: STFT, MEL100, MEL32, MEL40, MEL128')
+                    help='Input format: STFT, MEL100, MEL32, MEL40, MEL128, MEL64')
 parser.add_argument('--epochs', type=int, default=100,
                     metavar='N', help='number of epochs to train')
 parser.add_argument('--lr', type=float, default=0.001,
@@ -111,15 +111,13 @@ if args.arc == 'LeNet':
 
 elif args.arc == 'CNNRNN':
     if args.datacleaning:
-        if(args.input_format=='MEL100'):
-            model = CNNRNN(16280)
-        elif(args.input_format=='MEL128'):
-            model = CNNRNN(9680)
+        
+        model = CNNRNN()
+
     else:
-        if(args.input_format=='MEL100'):
-            model = CNNRNN(16280)
-        elif(args.input_format=='MEL128'):
-            model = CNNRNN(9680)
+       
+        model = CNNRNN()
+
 
 
 elif args.arc.startswith('VGG'):
