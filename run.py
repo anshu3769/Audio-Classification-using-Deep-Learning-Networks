@@ -30,6 +30,8 @@ parser.add_argument('--input_format', default='STFT',
                     help='Input format: STFT, MEL100, MEL32, MEL40, MEL128, MEL64')
 parser.add_argument('--epochs', type=int, default=100,
                     metavar='N', help='number of epochs to train')
+parser.add_argument('--max_len', type=int, default=101,
+                    help='max length of spectrogram')
 parser.add_argument('--lr', type=float, default=0.001,
                     metavar='LR', help='learning rate')
 parser.add_argument('--momentum', type=float, default=0.9,
@@ -66,61 +68,53 @@ if args.cuda:
 
 
 # loading data
-if args.datacleaning:
-    train_dataset = SpeechDataLoader(args.train_path, args.input_format, window_size=args.window_size, window_stride=args.window_stride,
-                               window_type=args.window_type, normalize=args.normalize, max_len=70, clean_data=args.datacleaning)
-else:
-    train_dataset = SpeechDataLoader(args.train_path, args.input_format, window_size=args.window_size, window_stride=args.window_stride,
-                               window_type=args.window_type, normalize=args.normalize)
+
+train_dataset = SpeechDataLoader(args.train_path, args.input_format, window_size=args.window_size, window_stride=args.window_stride,
+                               window_type=args.window_type, normalize=args.normalize, max_len=args.max_len, clean_data=args.datacleaning)
+
 
 train_loader = torch.utils.data.DataLoader(
     train_dataset, batch_size=args.batch_size, shuffle=True,
     num_workers=20, pin_memory=args.cuda, sampler=None)
 
-if args.datacleaning:
-    valid_dataset = SpeechDataLoader(args.valid_path, args.input_format, window_size=args.window_size, window_stride=args.window_stride,
-                               window_type=args.window_type, normalize=args.normalize, max_len=70, clean_data=args.datacleaning)
-else:
-    valid_dataset = SpeechDataLoader(args.valid_path, args.input_format, window_size=args.window_size, window_stride=args.window_stride,
-                               window_type=args.window_type, normalize=args.normalize)
 
+valid_dataset = SpeechDataLoader(args.valid_path, args.input_format, window_size=args.window_size, window_stride=args.window_stride,
+                               window_type=args.window_type, normalize=args.normalize, max_len=args.max_len, clean_data=args.datacleaning)
 
 valid_loader = torch.utils.data.DataLoader(
     valid_dataset, batch_size=args.batch_size, shuffle=None,
     num_workers=20, pin_memory=args.cuda, sampler=None)
 
-if args.datacleaning:
-    test_dataset = SpeechDataLoader(args.test_path,args.input_format, window_size=args.window_size, window_stride=args.window_stride,
-                              window_type=args.window_type, normalize=args.normalize, max_len=70, clean_data=args.datacleaning)
-else:
-    test_dataset = SpeechDataLoader(args.test_path,args.input_format, window_size=args.window_size, window_stride=args.window_stride,
-                              window_type=args.window_type, normalize=args.normalize)
+
+test_dataset = SpeechDataLoader(args.test_path,args.input_format, window_size=args.window_size, window_stride=args.window_stride,
+                              window_type=args.window_type, normalize=args.normalize, max_len=args.max_len, clean_data=args.datacleaning)
+
 test_loader = torch.utils.data.DataLoader(
     test_dataset, batch_size=args.test_batch_size, shuffle=None,
     num_workers=20, pin_memory=args.cuda, sampler=None)
 
 # build model
 if args.arc == 'LeNet':
-    if(args.input_format=='STFT'):
-        model = LeNet(16280)
-    elif(args.input_format=='MEL100'):
-        model = LeNet(9680)
-
-    else:
-        model = LeNet(16280)
-
-elif args.arc == 'CNNRNN':
+  
     if args.datacleaning:
-        
-        model = CNNRNN()
-
+        if(args.input_format=='STFT'):
+            model = LeNet(10360)
+        elif(args.input_format=='MEL40'):
+            model = LeNet(1960)
+        elif(args.input_format=='MEL100'):
+            model = LeNet(6160)
     else:
-       
-        model = CNNRNN()
 
+        if(args.input_format=='STFT'):
+            model = LeNet(16280)
+        elif(args.input_format=='MEL40'):
+            model = LeNet(3080)
+        elif(args.input_format=='MEL100'):
+            model = LeNet(9680)
 
 
 elif args.arc.startswith('VGG'):
+    # only using STFT
     if args.datacleaning:
         model = VGG(args.arc, 5120)
     else:
@@ -128,19 +122,35 @@ elif args.arc.startswith('VGG'):
 
 elif args.arc.startswith('ResNet'):
     
-    if(args.input_format=='MEL32'):
-        model = model.create_resnet_model(model_name=args.arc,num_classes=30, in_channels=1, last_layer_dim=2048)
-    elif(args.input_format=='MEL40'):
-        model = model.create_resnet_model(model_name=args.arc,num_classes=30, in_channels=1, last_layer_dim=4096)
 
-else:
-    if(args.input_format=='STFT'):
-        model = LeNet(16280)
-    elif(args.input_format=='MEL100'):
-        model = LeNet(9680)
+    if args.datacleaning:
+        if(args.input_format=='MEL32'):
+            model = model.create_resnet_model(model_name=args.arc,num_classes=30, in_channels=1, last_layer_dim=1536)
+        else:
+            model = model.create_resnet_model(model_name=args.arc,num_classes=30, in_channels=1, last_layer_dim=3072)
 
     else:
-        model = LeNet(16280)
+        if(args.input_format=='MEL32'):
+            model = model.create_resnet_model(model_name=args.arc,num_classes=30, in_channels=1, last_layer_dim=2048)
+        else:
+            model = model.create_resnet_model(model_name=args.arc,num_classes=30, in_channels=1, last_layer_dim=4096)
+
+else:
+    
+    if args.datacleaning:
+        if(args.input_format=='STFT'):
+            model = LeNet(10360)
+        elif(args.input_format=='MEL40'):
+            model = LeNet(1960)
+        elif(args.input_format=='MEL100'):
+            model = LeNet(6160)
+    else:
+        if(args.input_format=='STFT'):
+            model = LeNet(16280)
+        elif(args.input_format=='MEL40'):
+            model = LeNet(3080)
+        elif(args.input_format=='MEL100'):
+            model = LeNet(9680)
 
 
 
