@@ -65,7 +65,9 @@ def spect_loader(path, window_size, window_stride, window, normalize, input_form
 
     # Clean the input
     if(clean_data):
+        
         y = cleanData(y)
+    
 
     # Data processing: Convert audio files to the desired format based on the given input_format 
 
@@ -87,8 +89,9 @@ def spect_loader(path, window_size, window_stride, window, normalize, input_form
         spect = librosa.power_to_db(abs(S))
 
     if(input_format=="MEL100"):
-        S=librosa.feature.melspectrogram(y, sr=sr,n_fft=n_fft, hop_length=hop_length, n_mels=100)
+        S=librosa.feature.melspectrogram(y, sr=sr,n_fft=n_fft, hop_length=hop_length, n_mels=110)
         spect = librosa.power_to_db(abs(S))
+
     
     if(input_format=="RAW"):
         max_len = 16000
@@ -106,6 +109,14 @@ def spect_loader(path, window_size, window_stride, window, normalize, input_form
         return spect
     
 
+
+    if(input_format=="MEL128"):
+        S=librosa.feature.melspectrogram(y, sr=sr,n_fft=n_fft, hop_length=hop_length, n_mels=128)
+        spect = librosa.power_to_db(abs(S))
+    if(input_format=="MEL64"):
+        S=librosa.feature.melspectrogram(y, sr=sr,n_fft=n_fft, hop_length=hop_length, n_mels=64)
+        spect = librosa.power_to_db(abs(S))
+        
     
     # make all spects with the same dims
     # TODO: change that in the future
