@@ -242,35 +242,39 @@ class CNNRNN(nn.Module):
     def __init__(self):
         super(CNNRNN, self).__init__()
         
-        self.conv1 = nn.Conv2d(1, 32, kernel_size=3)
+        self.conv1 = nn.Conv2d(1, 32, kernel_size=3, stride=[2,1])
         self.bn1 = nn.BatchNorm2d(32)
-        self.conv1_drop = nn.Dropout2d(p=0.1)
+        self.conv1_drop = nn.Dropout2d(p=0.2)
         
         self.conv2 = nn.Conv2d(32, 64, kernel_size=3)
         self.bn2 = nn.BatchNorm2d(64)
-        self.conv2_drop = nn.Dropout2d(p=0.15)
+        self.conv2_drop = nn.Dropout2d(p=0.25)
         
         self.conv3 = nn.Conv2d(64, 64, kernel_size=3)
         self.bn3 = nn.BatchNorm2d(64)
-        self.conv3_drop = nn.Dropout2d(p=0.2)
+        self.conv3_drop = nn.Dropout2d(p=0.3)
         
-        self.rnn = nn.LSTM(128, 64, 1, batch_first=True, bidirectional=True)
+        self.rnn = nn.LSTM(256, 128, 2, batch_first=True)
         
-        self.fc1 = nn.Linear(128,30)
-        self.fc1_drop = nn.Dropout(p=0.3)
+        self.fc1 = nn.Linear(1280,640)
+        self.fc1_drop = nn.Dropout(p=0.4)
+    
+        self.fc2 = nn.Linear(640,30)
+        self.fc2_drop = nn.Dropout(p=0.5)
+    
     
     def forward(self, x):
         #print(x.shape)
-        x = F.max_pool2d(self.bn1(self.conv1_drop(F.relu(self.conv1(x)))),3)
+        x = F.max_pool2d(self.bn1(self.conv1_drop(F.relu(self.conv1(x)))), 2)
         #print(x.shape)
-        x = F.max_pool2d(self.bn2(self.conv2_drop(F.relu(self.conv2(x)))), 4)
+        x = F.max_pool2d(self.bn2(self.conv2_drop(F.relu(self.conv2(x)))), 2)
         #print(x.shape)
-        x = F.max_pool2d(self.bn3(self.conv3_drop(F.relu(self.conv3(x)))), 4)
+        x = F.max_pool2d(self.bn3(self.conv3_drop(F.relu(self.conv3(x)))), 2)
         #print(x.shape)
-        # xt -> (batch, time, freq, channel)
+        
         x = x.transpose(1, -1)
         #print(x.shape)
-        # xt -> (batch, time, channel*freq)
+        
         batch, time = x.size()[:2]
         x = x.reshape(batch, time, -1)
         #print(x.shape)
@@ -278,9 +282,10 @@ class CNNRNN(nn.Module):
         x, hidden = self.rnn(x)
         
         #print(x.shape)
-        x=x.squeeze()
+        x = x.reshape(-1, 10*128)
         #print(x.shape)
         x = F.relu(self.fc1_drop(self.fc1(x)))
+        x = F.relu(self.fc2_drop(self.fc2(x)))
         #print(x.shape)
         return F.log_softmax(x, dim=1)
 
