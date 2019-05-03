@@ -116,7 +116,8 @@ if args.arc == 'LeNet':
         elif(args.input_format=='MEL100'):
             model = LeNet(9680)
 
-
+elif args.arc == 'CNNRNN':
+    model=CNNRNN()
 elif args.arc.startswith('VGG'):
     # only using STFT
     if args.datacleaning:
