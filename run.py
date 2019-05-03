@@ -46,8 +46,7 @@ parser.add_argument('--seed', type=int, default=1234,
                     metavar='S', help='random seed')
 parser.add_argument('--log-interval', type=int, default=10, metavar='N',
                     help='num of batches to wait until logging train status')
-parser.add_argument('--max_len', type=int, default=101, metavar='N',
-                    help='Max len for spectrogram')
+
 parser.add_argument('--patience', type=int, default=5, metavar='N',
                     help='how many epochs of no loss improvement should we wait before stop training')
 parser.add_argument('--loss_func', default='NLL',
