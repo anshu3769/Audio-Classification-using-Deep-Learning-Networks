@@ -183,7 +183,7 @@ itr=0
 
 
 # training with early stopping
-while (epoch < args.epochs + 1) and (iteration < args.patience) and (itr<args.patience):
+while (epoch < args.epochs + 1) and (iteration < args.patience):
     train(train_loader, model, optimizer, epoch, args.cuda, args.log_interval, args.loss_func)
     valid_loss = val(valid_loader, model, args.cuda,args.loss_func)
     if valid_loss > best_valid_loss:
