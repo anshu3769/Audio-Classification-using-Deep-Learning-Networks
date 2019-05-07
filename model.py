@@ -346,20 +346,22 @@ class CNN1DRNN(nn.Module):
     def __init__(self):
         super(CNN1DRNN, self).__init__()
         
-        self.conv1 = nn.Conv1d(1, 64, kernel_size=50, stride=100)
-        self.bn1 = nn.BatchNorm1d(64)
+        self.conv1 = nn.Conv1d(1, 32, kernel_size=100, stride=10)
+        self.bn1 = nn.BatchNorm1d(32)
         #self.conv1_drop = nn.Dropout1d(p=0.3)
         
-        self.conv2 = nn.Conv1d(64, 64, kernel_size=50, stride=100)
+        self.conv2 = nn.Conv1d(32, 64, kernel_size=100, stride=10)
         self.bn2 = nn.BatchNorm1d(64)
         #self.conv2_drop = nn.Dropout1d(p=0.3)
         
         
         
-        self.rnn = nn.LSTM(64, 32, 1, batch_first=True, bidirectional=False)
+        self.rnn = nn.LSTM(64, 32, 2, batch_first=True, bidirectional=True)
         
-        self.fc1 = nn.Linear(64,30)
+        self.fc1 = nn.Linear(9600,1024)
         self.fc1_drop = nn.Dropout(p=0.3)
+        self.fc2 = nn.Linear(1024,30)
+        self.fc2_drop = nn.Dropout(p=0.4)
     
     def forward(self, x):
         #print(x.shape)
@@ -369,23 +371,20 @@ class CNN1DRNN(nn.Module):
         #print(x.shape)
         
         
-        # xt -> (batch, time, freq, channel)
+        
         x = x.transpose(1, -1)
         #print(x.shape)
-        # xt -> (batch, time, channel*freq)
-        #batch, time = x.size()[:2]
-        #x = x.reshape(batch, time, -1)
-        #print(x.shape)
+      
         
         x, hidden = self.rnn(x)
         #print(x.shape)
         conv_seq_len = x.size(1)
-        #print(conv_seq_len)
-        x=x.contiguous()
-        x = x.view(100, 32 * conv_seq_len)
+        
+        x = x.reshape(-1, 64 * conv_seq_len)
         #print(x.shape)
         #x=x.squeeze()
         #print(x.shape)
         x = F.relu(self.fc1_drop(self.fc1(x)))
+        x = F.relu(self.fc2_drop(self.fc2(x)))
         #print(x.shape)
         return F.log_softmax(x, dim=1)

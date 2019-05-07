@@ -6,7 +6,7 @@ import torch.optim as optim
 from data_loader import SpeechDataLoader
 import numpy as np
 
-from model import LeNet, VGG, CNNRNN
+from model import LeNet, VGG, CNNRNN, CNN1DRNN
 
 
 import model as model
@@ -118,6 +118,9 @@ if args.arc == 'LeNet':
 
 elif args.arc == 'CNNRNN':
     model=CNNRNN()
+
+elif args.arc == 'CNN1DRNN':
+    model=CNN1DRNN()
 elif args.arc.startswith('VGG'):
     # only using STFT
     if args.datacleaning:
