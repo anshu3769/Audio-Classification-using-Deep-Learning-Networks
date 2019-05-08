@@ -55,9 +55,6 @@ Train Epoch: 1 [44880/51088 (100%)]	Loss: 2.589608
 
 Train set: Average loss: 2.8379
 
-/content/train.py:77: UserWarning: volatile was removed and now has no effect. Use `with torch.no_grad():` instead.
-  data, target = Variable(data, volatile=True), Variable(target)
-
 Validation set: Average loss: 2.1782, Accuracy: 4165/6798 (61%)
 
 Saving model...

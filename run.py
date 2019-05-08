@@ -141,6 +141,8 @@ elif args.arc.startswith('ResNet'):
 
         if(args.input_format=='MEL32'):
             model = model.create_resnet_model(model_name=args.arc,num_classes=30, in_channels=1, last_layer_dim=2048)
+        elif(args.input_format=='MEL100'):
+            model = model.create_resnet_model(model_name=args.arc,num_classes=30, in_channels=1, last_layer_dim=8192)
         else:
             model = model.create_resnet_model(model_name=args.arc,num_classes=30, in_channels=1, last_layer_dim=4096)
 
