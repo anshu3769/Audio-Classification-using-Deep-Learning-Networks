@@ -362,17 +362,23 @@ class CNN1DRNN(nn.Module):
         self.max_pool_3=nn.MaxPool1d(4)
         
         
-        self.conv4 = nn.Conv1d(256, 512, kernel_size=3, stride=1)
-        self.bn4 = nn.BatchNorm1d(512)
+        self.conv4 = nn.Conv1d(256, 256, kernel_size=3, stride=1)
+        self.bn4 = nn.BatchNorm1d(256)
         self.conv4_drop = nn.Dropout(p=0.3)
         self.max_pool_4=nn.MaxPool1d(4)
         
+        
+        
+        self.conv5 = nn.Conv1d(256, 512, kernel_size=3, stride=1)
+        self.bn5 = nn.BatchNorm1d(512)
+        self.conv5_drop = nn.Dropout(p=0.3)
+        self.avg_pool_5=nn.AvgPool1d(4)
         self.rnn = nn.LSTM(64, 32, 2, batch_first=True, bidirectional=True)
         
         #self.fc1 = nn.Linear(9600,1024) 100 kernel size
-        self.fc1 = nn.Linear(7168,1024)
+        self.fc1 = nn.Linear(7199,1024)
         self.fc1_drop = nn.Dropout(p=0.3)
-        self.fc2 = nn.Linear(1024,30)
+        self.fc2 = nn.Linear(1536,30)
         self.fc2_drop = nn.Dropout(p=0.4)
     
     def forward(self, x):
@@ -387,6 +393,9 @@ class CNN1DRNN(nn.Module):
         x = self.max_pool_4(self.bn4(F.relu(self.conv4(x))))
         #print(x.shape)
         
+        x = self.avg_pool_5(self.bn5(F.relu(self.conv5(x))))
+        #print(x.shape)
+        
         #x = x.transpose(1, -1)
         #print(x.shape)
       
@@ -399,7 +408,7 @@ class CNN1DRNN(nn.Module):
         #print(x.shape)
         x = x.view(x.size(0), -1)
         #print(x.shape)
-        x = F.relu(self.fc1_drop(self.fc1(x)))
+        #x = F.relu(self.fc1_drop(self.fc1(x)))
         #print(x.shape)
         x = F.relu(self.fc2_drop(self.fc2(x)))
         #print(x.shape)
