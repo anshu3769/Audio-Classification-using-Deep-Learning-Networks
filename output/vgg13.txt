@@ -1,4 +1,4 @@
-Namespace(arc='VGG13', batch_size=100, cuda=True, datacleaning=False, epochs=100, input_format='STFT', log_interval=10, loss_func='NLL', lr=0.001, max_len=101, momentum=0.9, normalize=True, optimizer='adam', patience=5, seed=1234, test_batch_size=100, test_path='data/test', train_path='data/train/', valid_path='data/valid', window_size=0.02, window_stride=0.01, window_type='hamming')
+Namespace(arc='VGG13', batch_size=100, cuda=True, datacleaning=False, epochs=100, input_format='SPECT', log_interval=10, loss_func='NLL', lr=0.001, max_len=101, momentum=0.9, normalize=True, optimizer='adam', patience=5, seed=1234, test_batch_size=100, test_path='data/test', train_path='data/train/', valid_path='data/valid', window_size=0.02, window_stride=0.01, window_type='hamming')
 Using CUDA with 1 GPUs
 Train Epoch: 1 [0/51088 (0%)]	Loss: 3.447506
 Train Epoch: 1 [1000/51088 (2%)]	Loss: 4.713504
