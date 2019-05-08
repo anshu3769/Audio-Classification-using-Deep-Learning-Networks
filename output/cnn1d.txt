@@ -1,4 +1,4 @@
-Namespace(arc='CNN1DRNN', batch_size=100, cuda=True, datacleaning=False, epochs=100, input_format='RAW', log_interval=10, loss_func='NLL', lr=0.0001, max_len=101, momentum=0.9, normalize=True, optimizer='adam', patience=5, seed=1234, test_batch_size=100, test_path='data/test/', train_path='data/train/', valid_path='data/valid', window_size=0.02, window_stride=0.01, window_type='hamming')
+Namespace(arc='CNN1D', batch_size=100, cuda=True, datacleaning=False, epochs=100, input_format='RAW', log_interval=10, loss_func='NLL', lr=0.0001, max_len=101, momentum=0.9, normalize=True, optimizer='adam', patience=5, seed=1234, test_batch_size=100, test_path='data/test/', train_path='data/train/', valid_path='data/valid', window_size=0.02, window_stride=0.01, window_type='hamming')
 Using CUDA with 1 GPUs
 Train Epoch: 1 [0/51088 (0%)]	Loss: 3.368540
 Train Epoch: 1 [1000/51088 (2%)]	Loss: 3.385792
