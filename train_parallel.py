@@ -75,7 +75,6 @@ def valp(loader, model, cuda, loss_func,verbose=True):
         criterion = torch.nn.NLLLoss(reduction='sum')
     
     for data1, data2, target in loader:
-        print(data1.shape, data2.shape)
         if cuda:
             data1, target = data1.cuda(), target.cuda()
         data1, target = Variable(data1, volatile=True), Variable(target)
