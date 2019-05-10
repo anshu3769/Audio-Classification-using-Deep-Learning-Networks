@@ -6,7 +6,7 @@ import torch.optim as optim
 from data_loader import SpeechDataLoader
 import numpy as np
 
-from model import LeNet, VGG, CNNRNN, CNN1DRNN
+from model import LeNet, VGG, CNN1D, CNN1DRNN, CNNRNN
 
 
 import model as model
@@ -28,7 +28,7 @@ parser.add_argument('--batch_size', type=int, default=100,
 parser.add_argument('--test_batch_size', type=int, default=100,
                     metavar='N', help='batch size for testing')
 parser.add_argument('--arc', default='LeNet',
-                    help='network architecture: LeNet, VGG11, VGG13, VGG16, VGG19, ResNet18, ResNet34, CNNRNN')
+                    help='network architecture: LeNet, VGG11, VGG13, VGG16, VGG19, ResNet18, ResNet34, CNNRNN, CNN1D, CNN1DRNN')
 parser.add_argument('--input_format', default='STFT',
                     help='Input format: STFT, MEL100, MEL32, MEL40, MEL128, MEL64')
 parser.add_argument('--epochs', type=int, default=100,
@@ -121,6 +121,10 @@ elif args.arc == 'CNNRNN':
 
 elif args.arc == 'CNN1DRNN':
     model=CNN1DRNN()
+
+elif args.arc == 'CNN1D':
+    model=CNN1D()
+
 elif args.arc.startswith('VGG'):
     # only using STFT
     if args.datacleaning:
