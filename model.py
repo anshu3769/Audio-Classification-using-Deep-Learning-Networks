@@ -1,11 +1,11 @@
 import math
+import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import torch.utils.model_zoo as model_zoo
 
 def create_resnet_model(model_name, num_classes, in_channels, last_layer_dim):
     if model_name == "ResNet18":
-        #print("Create RESNET18 model")
         model = resnet18(num_classes=num_classes, in_channels=in_channels, last_layer_dim=last_layer_dim)
     if model_name == "ResNet34":
         model = resnet34(num_classes=num_classes, in_channels=in_channels, last_layer_dim=last_layer_dim)
@@ -49,14 +49,11 @@ class BasicBlock(nn.Module):
 
     def forward(self, x):
         residual = x
-        #print("BasicBlock x is ", x.size())
         out = self.conv1(x)
         out = self.bn1(out)
         out = self.relu(out)
-
         out = self.conv2(out)
         out = self.bn2(out)
-
         if self.downsample is not None:
             residual = self.downsample(x)
 
@@ -83,15 +80,12 @@ class Bottleneck(nn.Module):
 
     def forward(self, x):
         residual = x
-
         out = self.conv1(x)
         out = self.bn1(out)
         out = self.relu(out)
-
         out = self.conv2(out)
         out = self.bn2(out)
         out = self.relu(out)
-
         out = self.conv3(out)
         out = self.bn3(out)
 
@@ -120,9 +114,7 @@ class ResNet(nn.Module):
         self.avgpool = nn.AvgPool2d(1, stride=1)
         self.fc = nn.Linear(last_layer_dim * block.expansion, 512)
         self.fc1=nn.Linear(512,num_classes)
-        #print("RESNET CONST expansion = ", block.expansion)
-        #print("RESNET CONST num_classes = ", num_classes)
-
+        
         for m in self.modules():
             if isinstance(m, nn.Conv2d):
                 n = m.kernel_size[0] * m.kernel_size[1] * m.out_channels
@@ -149,7 +141,6 @@ class ResNet(nn.Module):
         return nn.Sequential(*layers)
 
     def forward(self, x):
-        #print("RESNET FORWARD x", x.size())
         x = self.conv1(x)
         x = self.bn1(x)
         x = self.relu(x)
@@ -162,8 +153,7 @@ class ResNet(nn.Module):
 
         x = self.avgpool(x)
         x = x.view(x.size(0), -1)
-        
-        #print("RESNET FORWARD x before fc ", x.size())
+
         x = self.fc(x)
         x = self.fc1(x)
         return x
@@ -264,34 +254,21 @@ class CNNRNN(nn.Module):
     
     
     def forward(self, x):
-        #print(x.shape)
         x = F.max_pool2d(self.bn1(self.conv1_drop(F.relu(self.conv1(x)))), 2)
-        #print(x.shape)
         x = F.max_pool2d(self.bn2(self.conv2_drop(F.relu(self.conv2(x)))), 2)
-        #print(x.shape)
         x = F.max_pool2d(self.bn3(self.conv3_drop(F.relu(self.conv3(x)))), 2)
-        #print(x.shape)
-        
         x = x.transpose(1, -1)
-        #print(x.shape)
-        
         batch, time = x.size()[:2]
         x = x.reshape(batch, time, -1)
-        #print(x.shape)
-        
+     
         x, hidden = self.rnn(x)
-        
-        #print(x.shape)
+
         x = x.reshape(-1, 10*128)
-        #print(x.shape)
+
         x = F.relu(self.fc1_drop(self.fc1(x)))
         x = F.relu(self.fc2_drop(self.fc2(x)))
-        #print(x.shape)
+
         return F.log_softmax(x, dim=1)
-
-
-
-    
 
 
 class LeNet(nn.Module):
@@ -312,9 +289,67 @@ class LeNet(nn.Module):
         x = self.fc2(x)
         return F.log_softmax(x, dim=1)
 
-
-
-
+class ParallelNet(nn.Module):
+    def __init__(self,linear_layer_dim):
+        super(ParallelNet, self).__init__()
+        self.conv1_2 = nn.Conv2d(1, 20, kernel_size=5)
+        self.conv2_2 = nn.Conv2d(20, 20, kernel_size=5)
+        self.conv2_2_drop = nn.Dropout2d()
+        self.fc1 = nn.Linear(linear_layer_dim, 1000)
+        self.fc2 = nn.Linear(1000, 30)
+    
+    
+    
+        self.conv1 = nn.Conv1d(1, 128, kernel_size=80, stride=4)
+        self.bn1 = nn.BatchNorm1d(128)
+        
+        self.max_pool_1=nn.MaxPool1d(4)
+        
+        self.conv2 = nn.Conv1d(128, 128, kernel_size=3, stride=1)
+        self.bn2 = nn.BatchNorm1d(128)
+        
+        self.max_pool_2=nn.MaxPool1d(4)
+        
+        self.conv3 = nn.Conv1d(128, 256, kernel_size=3, stride=1)
+        self.bn3 = nn.BatchNorm1d(256)
+        
+        self.max_pool_3=nn.MaxPool1d(4)
+        
+        
+        self.conv4 = nn.Conv1d(256, 256, kernel_size=3, stride=1)
+        self.bn4 = nn.BatchNorm1d(256)
+        
+        self.max_pool_4=nn.MaxPool1d(4)
+        
+        
+        
+        self.conv5 = nn.Conv1d(256, 512, kernel_size=3, stride=1)
+        self.bn5 = nn.BatchNorm1d(512)
+        self.avg_pool_5=nn.AvgPool1d(4)
+    
+    def forward(self, x1, x2):
+        x1 = F.relu(F.max_pool2d(self.conv1_2(x1), 2))
+        x1 = F.relu(F.max_pool2d(self.conv2_2_drop(self.conv2_2(x1)), 2))
+        
+        #print(x1.shape)
+        
+        x2 = self.max_pool_1(self.bn1(F.relu(self.conv1(x2))))
+        x2 = self.max_pool_2(self.bn2(F.relu(self.conv2(x2))))
+        x2 = self.max_pool_3(self.bn3(F.relu(self.conv3(x2))))
+        x2 = self.max_pool_4(self.bn4(F.relu(self.conv4(x2))))
+        x2 = self.avg_pool_5(self.bn5(F.relu(self.conv5(x2))))
+        #print(x2.shape)
+        
+        x1 = x1.view(x1.size(0), -1)
+        x2 = x2.view(x2.size(0), -1)
+        #print(x1.shape)
+        #print(x2.shape)
+        y = torch.cat((x1,x2),dim=1)
+        #print(y.shape)
+        x = F.relu(self.fc1(y))
+        x = F.dropout(x, training=self.training)
+        x = self.fc2(x)
+        return F.log_softmax(x, dim=1)
 
 cfg = {
     'VGG11': [64, 'M', 128, 'M', 256, 256, 'M', 512, 512, 'M', 512, 512, 'M'],
@@ -340,78 +375,51 @@ class VGG(nn.Module):
 
 
 
-
-
 class CNN1D(nn.Module):
     def __init__(self):
         super(CNN1D, self).__init__()
         
         self.conv1 = nn.Conv1d(1, 128, kernel_size=80, stride=4)
         self.bn1 = nn.BatchNorm1d(128)
-        self.conv1_drop = nn.Dropout(p=0.3)
+
         self.max_pool_1=nn.MaxPool1d(4)
         
         self.conv2 = nn.Conv1d(128, 128, kernel_size=3, stride=1)
         self.bn2 = nn.BatchNorm1d(128)
-        self.conv2_drop = nn.Dropout(p=0.3)
+
         self.max_pool_2=nn.MaxPool1d(4)
         
         self.conv3 = nn.Conv1d(128, 256, kernel_size=3, stride=1)
         self.bn3 = nn.BatchNorm1d(256)
-        self.conv3_drop = nn.Dropout(p=0.3)
+
         self.max_pool_3=nn.MaxPool1d(4)
         
         
         self.conv4 = nn.Conv1d(256, 256, kernel_size=3, stride=1)
         self.bn4 = nn.BatchNorm1d(256)
-        self.conv4_drop = nn.Dropout(p=0.3)
+
         self.max_pool_4=nn.MaxPool1d(4)
         
         
         
         self.conv5 = nn.Conv1d(256, 512, kernel_size=3, stride=1)
         self.bn5 = nn.BatchNorm1d(512)
-        self.conv5_drop = nn.Dropout(p=0.3)
         self.avg_pool_5=nn.AvgPool1d(4)
-        self.rnn = nn.LSTM(64, 32, 2, batch_first=True, bidirectional=True)
         
-        #self.fc1 = nn.Linear(9600,1024) 100 kernel size
-        self.fc1 = nn.Linear(7199,1024)
-        self.fc1_drop = nn.Dropout(p=0.3)
-        self.fc2 = nn.Linear(1536,30)
-        self.fc2_drop = nn.Dropout(p=0.4)
+        self.fc1 = nn.Linear(1536,30)
+        self.fc1_drop = nn.Dropout(p=0.4)
     
     def forward(self, x):
-        #print(x.shape)
         x = self.max_pool_1(self.bn1(F.relu(self.conv1(x))))
-        #print(x.shape)
         x = self.max_pool_2(self.bn2(F.relu(self.conv2(x))))
-        #print(x.shape)
-        
         x = self.max_pool_3(self.bn3(F.relu(self.conv3(x))))
-        #print(x.shape)
         x = self.max_pool_4(self.bn4(F.relu(self.conv4(x))))
-        #print(x.shape)
-        
         x = self.avg_pool_5(self.bn5(F.relu(self.conv5(x))))
-        #print(x.shape)
         
-        #x = x.transpose(1, -1)
-        #print(x.shape)
-      
-        
-        #x, hidden = self.rnn(x)
-        #print(x.shape)
-        #conv_seq_len = x.size(1)
-        
-        #x = x.reshape(-1, 64 * conv_seq_len)
-        #print(x.shape)
         x = x.view(x.size(0), -1)
-        #print(x.shape)
-        #x = F.relu(self.fc1_drop(self.fc1(x)))
-        #print(x.shape)
-        x = F.relu(self.fc2_drop(self.fc2(x)))
-        #print(x.shape)
+
+        x = F.relu(self.fc1_drop(self.fc1(x)))
+        
         return F.log_softmax(x, dim=1)
 
 
@@ -439,51 +447,22 @@ class CNN1DRNN(nn.Module):
         self.conv4 = nn.Conv1d(256, 256, kernel_size=3, stride=1)
         self.bn4 = nn.BatchNorm1d(256)
         self.conv4_drop = nn.Dropout(p=0.3)
-        self.max_pool_4=nn.MaxPool1d(4)
+        self.avg_pool_4=nn.AvgPool1d(4)
+        self.rnn = nn.LSTM(256, 128, 2, batch_first=True)
         
-        
-        
-        self.conv5 = nn.Conv1d(256, 512, kernel_size=3, stride=1)
-        self.bn5 = nn.BatchNorm1d(512)
-        self.conv5_drop = nn.Dropout(p=0.3)
-        self.avg_pool_5=nn.AvgPool1d(4)
-        self.rnn = nn.LSTM(256, 128, 2, batch_first=True, bidirectional=True)
-        
-        #self.fc1 = nn.Linear(9600,1024) 100 kernel size
-        self.fc1 = nn.Linear(7199,1024)
-        self.fc1_drop = nn.Dropout(p=0.3)
-        self.fc2 = nn.Linear(3584,30)
-        self.fc2_drop = nn.Dropout(p=0.4)
+        self.fc1 = nn.Linear(1792,30)
+        self.fc1_drop = nn.Dropout(p=0.4)
     
     def forward(self, x):
-        #print(x.shape)
         x = self.max_pool_1(self.bn1(F.relu(self.conv1(x))))
-        #print(x.shape)
         x = self.max_pool_2(self.bn2(F.relu(self.conv2(x))))
-        #print(x.shape)
-        
         x = self.max_pool_3(self.bn3(F.relu(self.conv3(x))))
-        #print(x.shape)
-        x = self.max_pool_4(self.bn4(F.relu(self.conv4(x))))
-        #print(x.shape)
-        
-        #x = self.avg_pool_5(self.bn5(F.relu(self.conv5(x))))
-        #print(x.shape)
-        
+        x = self.avg_pool_4(self.bn4(F.relu(self.conv4(x))))
         x = x.transpose(1, -1)
-        #print(x.shape)
-        
-        
         x, hidden = self.rnn(x)
-        #print(x.shape)
         conv_seq_len = x.size(1)
         
-        x = x.reshape(-1, 256 * conv_seq_len)
-        #print(x.shape)
-        #x = x.view(x.size(0), -1)
-        #print(x.shape)
-        #x = F.relu(self.fc1_drop(self.fc1(x)))
-        #print(x.shape)
-        x = F.relu(self.fc2_drop(self.fc2(x)))
-        #print(x.shape)
+        x = x.reshape(-1, 128 * conv_seq_len)
+
+        x = F.relu(self.fc1_drop(self.fc1(x)))
         return F.log_softmax(x, dim=1)

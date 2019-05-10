@@ -141,7 +141,7 @@ def spect_loader(path, window_size, window_stride, window, normalize, input_form
     return spect
 
 
-class SpeechDataLoader(data.Dataset):
+class SpeechDataLoaderP(data.Dataset):
     """A google speech command data set loader where the wavs are arranged in this way: ::
         root/one/xxx.wav
         root/one/xxy.wav
@@ -197,13 +197,14 @@ class SpeechDataLoader(data.Dataset):
             tuple: (spect, target) where target is class_index of the target class.
         """
         path, target = self.spects[index]
-        spect = self.loader(path, self.window_size, self.window_stride, self.window_type, self.normalize, self.input_format,  self.max_len, self.clean_data)
+        spect = self.loader(path, self.window_size, self.window_stride, self.window_type, self.normalize, "STFT",  self.max_len, self.clean_data)
+        raw = self.loader(path, self.window_size, self.window_stride, self.window_type, self.normalize, "RAW",  self.max_len, self.clean_data)
         if self.transform is not None:
             spect = self.transform(spect)
         if self.target_transform is not None:
             target = self.target_transform(target)
-
-        return spect, target
+        
+        return spect, raw, target
 
     def __len__(self):
         return len(self.spects)
