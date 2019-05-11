@@ -260,7 +260,8 @@ elif args.arc.startswith('ResNet'):
             print("Wrong input format")
 
 elif args.arc == 'Parallel':
-    model=ParallelNet(17816)
+#model=ParallelNet(17816)
+    model=ParallelNet(10752)
 else:
     #Lenet with STFT
     model = LeNet(16280)

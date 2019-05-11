@@ -73,11 +73,10 @@ def spect_loader(path, window_size, window_stride, window, normalize, input_form
 
     # 1. STFT: allows one to see how different frequencies change over time.
     if(input_format=="STFT"):
-    	D = librosa.stft(y, n_fft=n_fft, hop_length=hop_length,
-                     win_length=win_length, window=window)
-    	spect, phase = librosa.magphase(D)
-    	# S = log(S+1)
-    	spect = np.log1p(spect)
+        D = librosa.stft(y, n_fft=n_fft, hop_length=hop_length, win_length=win_length, window=window)
+        spect, phase = librosa.magphase(D)
+        spect = librosa.amplitude_to_db(spect,ref=np.max)
+        
 	
     #2. Mel
     if(input_format=="MEL32"):
