@@ -6,6 +6,7 @@ import pickle
 
 import torch 
 def train(loader, model, optimizer, epoch, cuda, log_interval, loss_func, verbose=True):
+    """ Train the model """
     model.train()
     global_epoch_loss = 0
     
@@ -15,8 +16,6 @@ def train(loader, model, optimizer, epoch, cuda, log_interval, loss_func, verbos
     if(loss_func=='NLL'):
         criterion = torch.nn.NLLLoss()
         criterion2 = torch.nn.NLLLoss(reduction='sum')
-
-
 
     for batch_idx, (data, target) in enumerate(loader):
         if cuda:
@@ -41,6 +40,7 @@ def train(loader, model, optimizer, epoch, cuda, log_interval, loss_func, verbos
 
 
 def test(loader, model, cuda,loss_func, verbose=True):
+    """Test the trained model """
     model.eval()
     test_loss = 0
     correct = 0
@@ -84,6 +84,7 @@ def test(loader, model, cuda,loss_func, verbose=True):
     return test_loss
 
 def val(loader, model, cuda, loss_func,verbose=True):
+    """Validate the trained model """
     model.eval()
     test_loss = 0
     correct = 0
@@ -98,9 +99,6 @@ def val(loader, model, cuda, loss_func,verbose=True):
         data, target = Variable(data, volatile=True), Variable(target)
         output = model(data)
 
-        
-        
-
         test_loss += criterion(output, target).data  # sum up batch loss
         pred = output.data.max(1, keepdim=True)[1]  # get the index of the max log-probability
         correct += pred.eq(target.data.view_as(pred)).cpu().sum()
@@ -112,7 +110,7 @@ def val(loader, model, cuda, loss_func,verbose=True):
     return test_loss
 
 def calculate_precision_recall(prediction, actual):
-    
+    """ Calculate the precision/recall of the model """
     # Number of classes = 30
     tp = [0] * 30  # True positives
     fp = [0] * 30  # True negatives
