@@ -266,8 +266,6 @@ class ParallelNet(nn.Module):
         self.conv1_2 = nn.Conv2d(1, 20, kernel_size=5)
         self.conv2_2 = nn.Conv2d(20, 20, kernel_size=5)
         self.conv2_2_drop = nn.Dropout2d()
-        self.fc1 = nn.Linear(linear_layer_dim, 1000)
-        self.fc2 = nn.Linear(1000, 30)
       
         self.conv1 = nn.Conv1d(1, 128, kernel_size=80, stride=4)
         self.bn1 = nn.BatchNorm1d(128)
@@ -293,6 +291,9 @@ class ParallelNet(nn.Module):
         self.conv5 = nn.Conv1d(256, 512, kernel_size=3, stride=1)
         self.bn5 = nn.BatchNorm1d(512)
         self.avg_pool_5=nn.AvgPool1d(4)
+        
+        self.fc1 = nn.Linear(linear_layer_dim, 1000)
+        self.fc2 = nn.Linear(1000, 30)
     
     def forward(self, x1, x2):
         x1 = F.relu(F.max_pool2d(self.conv1_2(x1), 2))
