@@ -350,37 +350,38 @@ class CNN1D(nn.Module):
         
         self.conv1 = nn.Conv1d(1, 128, kernel_size=80, stride=4)
         self.bn1 = nn.BatchNorm1d(128)
-
+        self.dropout1 = nn.Dropout(p=0.2)
         self.max_pool_1=nn.MaxPool1d(4)
         
         self.conv2 = nn.Conv1d(128, 128, kernel_size=3, stride=1)
         self.bn2 = nn.BatchNorm1d(128)
-
+        self.dropout2 = nn.Dropout(p=0.5)
         self.max_pool_2=nn.MaxPool1d(4)
         
         self.conv3 = nn.Conv1d(128, 256, kernel_size=3, stride=1)
         self.bn3 = nn.BatchNorm1d(256)
-
+        self.dropout3 = nn.Dropout(p=0.5)
         self.max_pool_3=nn.MaxPool1d(4)
         
         
         self.conv4 = nn.Conv1d(256, 256, kernel_size=3, stride=1)
         self.bn4 = nn.BatchNorm1d(256)
-
+        self.dropout3 = nn.Dropout(p=0.5)
         self.max_pool_4=nn.MaxPool1d(4)
                
         self.conv5 = nn.Conv1d(256, 512, kernel_size=3, stride=1)
         self.bn5 = nn.BatchNorm1d(512)
+        self.dropout4 = nn.Dropout(p=0.2)
         self.avg_pool_5=nn.AvgPool1d(4)
         
         self.fc1 = nn.Linear(1536,30)
         self.fc1_drop = nn.Dropout(p=0.4)
     
     def forward(self, x):
-        x = self.max_pool_1(self.bn1(F.relu(self.conv1(x))))
+        x = self.max_pool_1(self.dropout1(self.bn1(F.relu(self.conv1(x)))))
         x = self.max_pool_2(self.bn2(F.relu(self.conv2(x))))
         x = self.max_pool_3(self.bn3(F.relu(self.conv3(x))))
-        x = self.max_pool_4(self.bn4(F.relu(self.conv4(x))))
+        x = self.max_pool_4(self.dropout4(self.bn4(F.relu(self.conv4(x)))))
         x = self.avg_pool_5(self.bn5(F.relu(self.conv5(x))))
         
         x = x.view(x.size(0), -1)
