@@ -254,8 +254,8 @@ class CNNRNN(nn.Module):
     
     
     def forward(self, x):
-        x = F.max_pool2d(self.bn1(self.conv1_drop(F.relu(self.conv1(x)))), 2)
-        x = F.max_pool2d(self.bn2(self.conv2_drop(F.relu(self.conv2(x)))), 2)
+        x = F.max_pool2d(self.bn1(F.relu(self.conv1(x))), 2)
+        x = F.max_pool2d(self.bn2(F.relu(self.conv2(x))), 2)
         x = F.max_pool2d(self.bn3(self.conv3_drop(F.relu(self.conv3(x)))), 2)
         x = x.transpose(1, -1)
         batch, time = x.size()[:2]
@@ -292,11 +292,25 @@ class LeNet(nn.Module):
 class ParallelNet(nn.Module):
     def __init__(self,linear_layer_dim):
         super(ParallelNet, self).__init__()
-        self.conv1_2 = nn.Conv2d(1, 20, kernel_size=5)
-        self.conv2_2 = nn.Conv2d(20, 20, kernel_size=5)
+        self.conv1_2 = nn.Conv2d(1, 16, kernel_size=3)
+        self.bn1_2 = nn.BatchNorm2d(16)
+        
+        self.conv2_2 = nn.Conv2d(16, 32, kernel_size=3)
+        self.bn2_2 = nn.BatchNorm2d(32)
+        
         self.conv2_2_drop = nn.Dropout2d()
-        self.fc1 = nn.Linear(linear_layer_dim, 1000)
-        self.fc2 = nn.Linear(1000, 30)
+        self.conv3_2 = nn.Conv2d(32, 32, kernel_size=3)
+        self.bn3_2 = nn.BatchNorm2d(32)
+        
+        
+        self.conv4_2 = nn.Conv2d(32, 64, kernel_size=3)
+        self.bn4_2 = nn.BatchNorm2d(64)
+        
+        self.conv3_2_drop = nn.Dropout2d()
+        
+        
+        self.fc1 = nn.Linear(13056, 1024)
+        self.fc2 = nn.Linear(1024, 30)
     
     
     
@@ -328,10 +342,11 @@ class ParallelNet(nn.Module):
         self.avg_pool_5=nn.AvgPool1d(4)
     
     def forward(self, x1, x2):
-        x1 = F.relu(F.max_pool2d(self.conv1_2(x1), 2))
-        x1 = F.relu(F.max_pool2d(self.conv2_2_drop(self.conv2_2(x1)), 2))
+        x1 = self.bn1_2(F.relu(self.conv1_2(x1)))
+        x1 = F.max_pool2d(self.bn2_2(F.relu(self.conv2_2(x1))), 2)
+        x1 = F.max_pool2d(self.bn3_2(F.relu(self.conv3_2(x1))), 2)
+        x1 = F.max_pool2d(self.conv2_2_drop(self.bn4_2(F.relu(self.conv4_2(x1)))), 2)
         
-        #print(x1.shape)
         
         x2 = self.max_pool_1(self.bn1(F.relu(self.conv1(x2))))
         x2 = self.max_pool_2(self.bn2(F.relu(self.conv2(x2))))
