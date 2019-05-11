@@ -75,8 +75,8 @@ def test(loader, model, cuda,loss_func, verbose=True):
         pickle.dump(actual, f)
 
     precision, recall = calculate_precision_recall(prediction, actual)
-    print("Precision = ",prec)
-    print("Recall = ", rec)
+    print("Precision = ",precision)
+    print("Recall = ", recall)
 
     if verbose:
         print('\nTest set: Average loss: {:.4f}, Accuracy: {}/{} ({:.0f}%)\n'.format(

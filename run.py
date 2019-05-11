@@ -324,5 +324,7 @@ print("Time Taken ",elapsed_time)
 
 if args.arc == 'Parallel':
     parallel_test(test_loader1, model, args.cuda, args.loss_func)
+    torch.save(model.state_dict(), args.arc+".model")
 else:
     test(test_loader, model, args.cuda, args.loss_func)
+    torch.save(model.state_dict(), args.arc+".model")
