@@ -4,7 +4,7 @@ import argparse
 import torch
 import torch.optim as optim
 from data_loader import SpeechDataLoader
-from data_loader_parallel import SpeechDataLoaderP
+from data_loader_parallel import SpeechDataLoaderParallel
 import numpy as np
 import time
 from model import LeNet, VGG, CNN1D, CNN1DRNN, CNNRNN, ParallelNet
@@ -12,13 +12,13 @@ from model import LeNet, VGG, CNN1D, CNN1DRNN, CNNRNN, ParallelNet
 
 import model as model
 from train import train, test, val
-from train_parallel import trainp, testp, valp
+from train_parallel import parallel_train, parallel_test, parallel_val
 import os
 
 
 # Training settings
 parser = argparse.ArgumentParser(
-    description='ConvNets for Speech Commands Recognition')
+    description='Neural Networks for Speech Commands Recognition')
 parser.add_argument('--train_path', default='/train',
                     help='path to the train data folder')
 parser.add_argument('--test_path', default='/test',
@@ -32,7 +32,7 @@ parser.add_argument('--test_batch_size', type=int, default=100,
 parser.add_argument('--arc', default='LeNet',
                     help='network architecture: LeNet, VGG11, VGG13, VGG16, VGG19, ResNet18, ResNet34, CNNRNN, CNN1D, CNN1DRNN, Parallel')
 parser.add_argument('--input_format', default='STFT',
-                    help='Input format: STFT, MEL100, MEL32, MEL40, MEL128, MEL64')
+                    help='Input format: STFT, MEL100, MEL32, MEL40, MEL128, MEL64, RAW')
 parser.add_argument('--epochs', type=int, default=100,
                     metavar='N', help='number of epochs to train')
 parser.add_argument('--max_len', type=int, default=101,
@@ -74,49 +74,115 @@ if args.cuda:
 
 
 # loading data
-if args.arc == 'Parallel':
-    train_dataset1 = SpeechDataLoaderP(args.train_path, "STFT", window_size=args.window_size, window_stride=args.window_stride,
-                                 window_type=args.window_type, normalize=args.normalize, max_len=args.max_len, clean_data=args.datacleaning)
+if args.arc == 'Parallel':  # If two models are to be trained in parallel
+    train_dataset1 = SpeechDataLoaderParallel(
+                                              args.train_path,
+                                              "STFT",window_size=args.window_size,
+                                              window_stride=args.window_stride,
+                                              window_type=args.window_type,
+                                              normalize=args.normalize,
+                                              max_len=args.max_len,
+                                              clean_data=args.datacleaning)
+                                              
     train_loader1 = torch.utils.data.DataLoader(
-                                           train_dataset1, batch_size=args.batch_size, shuffle=True,
-                                           num_workers=20, pin_memory=args.cuda, sampler=None)
-    valid_dataset1 = SpeechDataLoaderP(args.valid_path, "STFT", window_size=args.window_size, window_stride=args.window_stride,
-                                         window_type=args.window_type, normalize=args.normalize, max_len=args.max_len, clean_data=args.datacleaning)
+                                                train_dataset1,
+                                                batch_size=args.batch_size,
+                                                shuffle=True,
+                                                num_workers=20,
+                                                pin_memory=args.cuda,
+                                                sampler=None)
+                                                
+    valid_dataset1 = SpeechDataLoaderParallel(
+                                              args.valid_path,
+                                              "STFT", window_size=args.window_size,
+                                              window_stride=args.window_stride,
+                                              window_type=args.window_type,
+                                              normalize=args.normalize,
+                                              max_len=args.max_len,
+                                              clean_data=args.datacleaning)
+                                              
     valid_loader1 = torch.utils.data.DataLoader(
-                                           valid_dataset1, batch_size=args.batch_size, shuffle=None,
-                                           num_workers=20, pin_memory=args.cuda, sampler=None)
-    test_dataset1 = SpeechDataLoaderP(args.test_path, "STFT", window_size=args.window_size, window_stride=args.window_stride,
-                                        window_type=args.window_type, normalize=args.normalize, max_len=args.max_len, clean_data=args.datacleaning)
+                                                valid_dataset1,
+                                                batch_size=args.batch_size,
+                                                shuffle=None,
+                                                num_workers=20,
+                                                pin_memory=args.cuda,
+                                                sampler=None)
+                                                
+    test_dataset1 = SpeechDataLoaderParallel(
+                                             args.test_path,
+                                             "STFT",
+                                             window_size=args.window_size,
+                                             window_stride=args.window_stride,
+                                             window_type=args.window_type,
+                                             normalize=args.normalize,
+                                             max_len=args.max_len,
+                                             clean_data=args.datacleaning)
+                                             
     test_loader1 = torch.utils.data.DataLoader(
-                                          test_dataset1, batch_size=args.test_batch_size, shuffle=None,
-                                          num_workers=20, pin_memory=args.cuda, sampler=None)
+                                               test_dataset1,
+                                               batch_size=args.test_batch_size,
+                                               shuffle=None,
+                                               num_workers=20,
+                                               pin_memory=args.cuda,
+                                               sampler=None)
 
 
 else:
-
-    train_dataset = SpeechDataLoader(args.train_path, args.input_format, window_size=args.window_size, window_stride=args.window_stride,
-                                   window_type=args.window_type, normalize=args.normalize, max_len=args.max_len, clean_data=args.datacleaning)
-
+    train_dataset = SpeechDataLoader(
+                                     args.train_path,
+                                     args.input_format,
+                                     window_size=args.window_size,
+                                     window_stride=args.window_stride,
+                                     window_type=args.window_type,
+                                     normalize=args.normalize,
+                                     max_len=args.max_len,
+                                     clean_data=args.datacleaning)
 
     train_loader = torch.utils.data.DataLoader(
-        train_dataset, batch_size=args.batch_size, shuffle=True,
-        num_workers=20, pin_memory=args.cuda, sampler=None)
+                                               train_dataset,
+                                               batch_size=args.batch_size,
+                                               shuffle=True,
+                                               num_workers=20,
+                                               pin_memory=args.cuda,
+                                               sampler=None)
 
 
-    valid_dataset = SpeechDataLoader(args.valid_path, args.input_format, window_size=args.window_size, window_stride=args.window_stride,
-                                   window_type=args.window_type, normalize=args.normalize, max_len=args.max_len, clean_data=args.datacleaning)
+    valid_dataset = SpeechDataLoader(
+                                     args.valid_path,
+                                     args.input_format,
+                                     window_size=args.window_size,
+                                     window_stride=args.window_stride,
+                                     window_type=args.window_type,
+                                     normalize=args.normalize,
+                                     max_len=args.max_len,
+                                     clean_data=args.datacleaning)
 
     valid_loader = torch.utils.data.DataLoader(
-        valid_dataset, batch_size=args.batch_size, shuffle=None,
-        num_workers=20, pin_memory=args.cuda, sampler=None)
+                                               valid_dataset,
+                                               batch_size=args.batch_size,
+                                               shuffle=None,
+                                               num_workers=20,
+                                               pin_memory=args.cuda,
+                                               sampler=None)
 
 
-    test_dataset = SpeechDataLoader(args.test_path,args.input_format, window_size=args.window_size, window_stride=args.window_stride,
-                                  window_type=args.window_type, normalize=args.normalize, max_len=args.max_len, clean_data=args.datacleaning)
+    test_dataset = SpeechDataLoader(
+                                    args.test_path,args.input_format,
+                                    window_size=args.window_size,
+                                    window_stride=args.window_stride,
+                                    window_type=args.window_type,
+                                    normalize=args.normalize,
+                                    max_len=args.max_len,
+                                    clean_data=args.datacleaning)
 
     test_loader = torch.utils.data.DataLoader(
-        test_dataset, batch_size=args.test_batch_size, shuffle=None,
-        num_workers=20, pin_memory=args.cuda, sampler=None)
+                                              test_dataset,
+                                              batch_size=args.test_batch_size,
+                                              shuffle=None,
+                                              num_workers=20,
+                                              pin_memory=args.cuda,
+                                              sampler=None)
 
 # build model
 
@@ -227,8 +293,8 @@ start_time = time.time()
 # training with early stopping
 while (epoch < args.epochs + 1) and (iteration < args.patience):
     if args.arc == 'Parallel':
-        trainp(train_loader1, model, optimizer, epoch, args.cuda, args.log_interval, args.loss_func)
-        valid_loss = valp(valid_loader1, model, args.cuda,args.loss_func)
+        parallel_train(train_loader1, model, optimizer, epoch, args.cuda, args.log_interval, args.loss_func)
+        valid_loss = parallel_val(valid_loader1, model, args.cuda,args.loss_func)
     
     else:
         train(train_loader, model, optimizer, epoch, args.cuda, args.log_interval, args.loss_func)
@@ -258,6 +324,8 @@ print("Time Taken ",elapsed_time)
 
 
 if args.arc == 'Parallel':
-    testp(test_loader1, model, args.cuda, args.loss_func)
+    parallel_test(test_loader1, model, args.cuda, args.loss_func)
+    torch.save(model.state_dict(), args.arc+".model")
 else:
     test(test_loader, model, args.cuda, args.loss_func)
+    torch.save(model.state_dict(), args.arc+".model")

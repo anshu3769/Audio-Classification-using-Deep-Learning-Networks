@@ -3,10 +3,13 @@ The aim of the project is to analyse performance of various neural networks in i
 1. Lenet
 2. VGG
 3. ResNet
-4. RNN (TO BE ADDED)
+4. CNNRNN
+5. CNN-1D
+6. Parallel Net ( combination of two netoworks trained in parallel)
 
 # Performance of the networks
-TO BE ADDED
+The following table shows the accuracies of the trained networks:
+
 
 # Steps to train/test a model
 Please follow the steps to train/test a model: 
@@ -31,9 +34,9 @@ Please follow the steps to train/test a model:
   9. python create_dataset.py ../data --out_path ../speechdata
 
 ## Run the model
-  1. python run.py --train_path ../speechdata/train/ --valid_path ../speechdata/valid --test_path ../speechdata/test
+  1. python run.py --train_path ../speechdata/train/ --valid_path ../speechdata/valid --test_path ../speechdata/test --model CNN1D 
   
-  Note: You can specify other arguments to the run.py script like batch_size, model e.t.c. You can find them all in the file itself.
+  Note: You can specify/change arguments to the run.py script like batch_size, model e.t.c. The information on other options is present in the run.py script.
 
 
 We have run this project on NYU Prince server using Slurm batch script.

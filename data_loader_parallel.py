@@ -140,7 +140,7 @@ def spect_loader(path, window_size, window_stride, window, normalize, input_form
     return spect
 
 
-class SpeechDataLoaderP(data.Dataset):
+class SpeechDataLoaderParallel(data.Dataset):
     """A google speech command data set loader where the wavs are arranged in this way: ::
         root/one/xxx.wav
         root/one/xxy.wav
