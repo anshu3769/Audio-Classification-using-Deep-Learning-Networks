@@ -12,7 +12,7 @@ from model import LeNet, VGG, CNN1D, CNN1DRNN, CNNRNN, ParallelNet
 
 import model as model
 from train import train, test, val
-from train_parallel import trainp, testp, valp
+from train_parallel import parallel_train, parallel_test, parallel_val
 import os
 
 
@@ -226,8 +226,8 @@ start_time = time.time()
 # training with early stopping
 while (epoch < args.epochs + 1) and (iteration < args.patience):
     if args.arc == 'Parallel':
-        trainp(train_loader1, model, optimizer, epoch, args.cuda, args.log_interval, args.loss_func)
-        valid_loss = valp(valid_loader1, model, args.cuda,args.loss_func)
+        parallel_train(train_loader1, model, optimizer, epoch, args.cuda, args.log_interval, args.loss_func)
+        valid_loss = parallel_val(valid_loader1, model, args.cuda,args.loss_func)
     
     else:
         train(train_loader, model, optimizer, epoch, args.cuda, args.log_interval, args.loss_func)
@@ -257,6 +257,6 @@ print("Time Taken ",elapsed_time)
 
 
 if args.arc == 'Parallel':
-    testp(test_loader1, model, args.cuda, args.loss_func)
+    parallel_test(test_loader1, model, args.cuda, args.loss_func)
 else:
     test(test_loader, model, args.cuda, args.loss_func)
