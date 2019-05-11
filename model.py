@@ -4,17 +4,12 @@ import torch.nn as nn
 import torch.nn.functional as F
 import torch.utils.model_zoo as model_zoo
 
+############################ RESNET ##########################################
 def create_resnet_model(model_name, num_classes, in_channels, last_layer_dim):
     if model_name == "ResNet18":
         model = resnet18(num_classes=num_classes, in_channels=in_channels, last_layer_dim=last_layer_dim)
     if model_name == "ResNet34":
         model = resnet34(num_classes=num_classes, in_channels=in_channels, last_layer_dim=last_layer_dim)
-    elif model_name == "ResNet50":
-        model = resnet50(num_classes=num_classes, in_channels=in_channels, last_layer_dim=last_layer_dim)
-    elif model_name == "ResNet101":
-        model = resnet101(num_classes=num_classes, in_channels=in_channels, last_layer_dim=last_layer_dim)
-    elif model_name == "ResNet152":
-        model = resnet152(num_classes=num_classes, in_channels=in_channels, last_layer_dim=last_layer_dim)
     else:
         model = resnet18(num_classes=num_classes, in_channels=in_channels, last_layer_dim=last_layer_dim)
     return model
@@ -23,9 +18,6 @@ def create_resnet_model(model_name, num_classes, in_channels, last_layer_dim):
 model_urls = {
     'resnet18': 'https://download.pytorch.org/models/resnet18-5c106cde.pth',
     'resnet34': 'https://download.pytorch.org/models/resnet34-333f7ec4.pth',
-    'resnet50': 'https://download.pytorch.org/models/resnet50-19c8e357.pth',
-    'resnet101': 'https://download.pytorch.org/models/resnet101-5d3b4d8f.pth',
-    'resnet152': 'https://download.pytorch.org/models/resnet152-b121ed2d.pth',
 }
 
 def conv3x3(in_planes, out_planes, stride=1):
@@ -180,38 +172,10 @@ def resnet34(pretrained=False, **kwargs):
         model.load_state_dict(model_zoo.load_url(model_urls['resnet34']))
     return model
 
-
-def resnet50(pretrained=False, **kwargs):
-    """Constructs a ResNet-50 model.
-    Args:
-        pretrained (bool): If True, returns a model pre-trained on ImageNet
-    """
-    model = ResNet(Bottleneck, [3, 4, 6, 3], **kwargs)
-    if pretrained:
-        model.load_state_dict(model_zoo.load_url(model_urls['resnet50']))
-    return model
+#################################RESNET ####################################
 
 
-def resnet101(pretrained=False, **kwargs):
-    """Constructs a ResNet-101 model.
-    Args:
-        pretrained (bool): If True, returns a model pre-trained on ImageNet
-    """
-    model = ResNet(Bottleneck, [3, 4, 23, 3], **kwargs)
-    if pretrained:
-        model.load_state_dict(model_zoo.load_url(model_urls['resnet101']))
-    return model
 
-
-def resnet152(pretrained=False, **kwargs):
-    """Constructs a ResNet-152 model.
-    Args:
-        pretrained (bool): If True, returns a model pre-trained on ImageNet
-    """
-    model = ResNet(Bottleneck, [3, 8, 36, 3], **kwargs)
-    if pretrained:
-        model.load_state_dict(model_zoo.load_url(model_urls['resnet152']))
-    return model
 
 def _make_layers(cfg):
     layers = []
@@ -228,6 +192,7 @@ def _make_layers(cfg):
     return nn.Sequential(*layers)
 
 
+########################### CNNRNN ########################################
 class CNNRNN(nn.Module):
     def __init__(self):
         super(CNNRNN, self).__init__()
@@ -269,8 +234,11 @@ class CNNRNN(nn.Module):
         x = F.relu(self.fc2_drop(self.fc2(x)))
 
         return F.log_softmax(x, dim=1)
+    
+################ CNNRNN ###############################
 
 
+################## LeNet ###############################
 class LeNet(nn.Module):
     def __init__(self,linear_layer_dim):
         super(LeNet, self).__init__()
@@ -288,7 +256,10 @@ class LeNet(nn.Module):
         x = F.dropout(x, training=self.training)
         x = self.fc2(x)
         return F.log_softmax(x, dim=1)
+    
+############### LeNet ####################################
 
+################Parallel Net ##############################
 class ParallelNet(nn.Module):
     def __init__(self,linear_layer_dim):
         super(ParallelNet, self).__init__()
@@ -297,9 +268,7 @@ class ParallelNet(nn.Module):
         self.conv2_2_drop = nn.Dropout2d()
         self.fc1 = nn.Linear(linear_layer_dim, 1000)
         self.fc2 = nn.Linear(1000, 30)
-    
-    
-    
+      
         self.conv1 = nn.Conv1d(1, 128, kernel_size=80, stride=4)
         self.bn1 = nn.BatchNorm1d(128)
         
@@ -319,9 +288,7 @@ class ParallelNet(nn.Module):
         self.conv4 = nn.Conv1d(256, 256, kernel_size=3, stride=1)
         self.bn4 = nn.BatchNorm1d(256)
         
-        self.max_pool_4=nn.MaxPool1d(4)
-        
-        
+        self.max_pool_4=nn.MaxPool1d(4)      
         
         self.conv5 = nn.Conv1d(256, 512, kernel_size=3, stride=1)
         self.bn5 = nn.BatchNorm1d(512)
@@ -350,14 +317,15 @@ class ParallelNet(nn.Module):
         x = F.dropout(x, training=self.training)
         x = self.fc2(x)
         return F.log_softmax(x, dim=1)
+    
+##################### Parallel Net ############################
 
+
+###################### VGG #####################################
 cfg = {
     'VGG11': [64, 'M', 128, 'M', 256, 256, 'M', 512, 512, 'M', 512, 512, 'M'],
     'VGG13': [64, 64, 'M', 128, 128, 'M', 256, 256, 'M', 512, 512, 'M', 512, 512, 'M'],
-    'VGG16': [64, 64, 'M', 128, 128, 'M', 256, 256, 256, 'M', 512, 512, 512, 'M', 512, 512, 512, 'M'],
-    'VGG19': [64, 64, 'M', 128, 128, 'M', 256, 256, 256, 256, 'M', 512, 512, 512, 512, 'M', 512, 512, 512, 512, 'M'],
 }
-
 
 class VGG(nn.Module):
     def __init__(self, vgg_name,linear_layer_dim):
@@ -372,9 +340,10 @@ class VGG(nn.Module):
         out = self.fc1(out)
         out = self.fc2(out)
         return F.log_softmax(out, dim=1)
+################# VGG #########################################
 
 
-
+################# CNN 1D ##################################
 class CNN1D(nn.Module):
     def __init__(self):
         super(CNN1D, self).__init__()
@@ -399,9 +368,7 @@ class CNN1D(nn.Module):
         self.bn4 = nn.BatchNorm1d(256)
 
         self.max_pool_4=nn.MaxPool1d(4)
-        
-        
-        
+               
         self.conv5 = nn.Conv1d(256, 512, kernel_size=3, stride=1)
         self.bn5 = nn.BatchNorm1d(512)
         self.avg_pool_5=nn.AvgPool1d(4)
@@ -421,9 +388,10 @@ class CNN1D(nn.Module):
         x = F.relu(self.fc1_drop(self.fc1(x)))
         
         return F.log_softmax(x, dim=1)
+################# CNN 1D #####################################
 
 
-
+################# CNN1D RNN ##################################
 class CNN1DRNN(nn.Module):
     def __init__(self):
         super(CNN1DRNN, self).__init__()
@@ -466,3 +434,5 @@ class CNN1DRNN(nn.Module):
 
         x = F.relu(self.fc1_drop(self.fc1(x)))
         return F.log_softmax(x, dim=1)
+
+   ########### CNN1D RNN  #########################################
