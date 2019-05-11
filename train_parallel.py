@@ -69,6 +69,9 @@ def valp(loader, model, cuda, loss_func,verbose=True):
     model.eval()
     test_loss = 0
     correct = 0
+    prediction = []
+    actual = []
+    
     if(loss_func=='CrossEntropy'):
         criterion = torch.nn.CrossEntropyLoss(reduction='sum')
     if(loss_func=='NLL'):
@@ -80,15 +83,50 @@ def valp(loader, model, cuda, loss_func,verbose=True):
         data1, target = Variable(data1, volatile=True), Variable(target)
         output = model(data1, data2)
 
-        
-        
-
         test_loss += criterion(output, target).data  # sum up batch loss
         pred = output.data.max(1, keepdim=True)[1]  # get the index of the max log-probability
+
+        prediction.extend([element.item() for element in pred.flatten()])
+        actual.extend([element.item() for element in target.data.view_as(pred).flatten()])
+
         correct += pred.eq(target.data.view_as(pred)).cpu().sum()
 
     test_loss /= len(loader.dataset)
+
+    precision, recall = calculate_precision_recall(prediction, actual)
+    print("Precision = ",prec)
+    print("Recall = ", rec)
+    
     if verbose:
         print('\nValidation set: Average loss: {:.4f}, Accuracy: {}/{} ({:.0f}%)\n'.format(
             test_loss, correct, len(loader.dataset), 100. * correct / len(loader.dataset)))
     return test_loss
+
+
+def calculate_precision_recall(prediction, actual):
+    
+    # Number of classes = 30
+    tp = [0] * 30  # True positives
+    fp = [0] * 30  # True negatives
+    actual_count = [0] * 30
+    precision = [0] * 30
+    recall = [0] * 30
+    
+    for p,a in zip(prediction,actual):
+        if p == a:
+            tp[p] += 1
+        else:
+            fp[p]+= 1
+
+    for a in actual:
+        actual_count[a] += 1
+
+    print("tp = ", tp)
+    print("fp = ", fp)
+    print("actual_count = ", actual_count)
+    for i in range(30):
+        if tp[i] != 0 or fp[i] != 0:
+            precision[i] = tp[i]/(tp[i] + fp[i])
+        recall[i] = tp[i]/actual_count[i]
+
+    return precision, recall
