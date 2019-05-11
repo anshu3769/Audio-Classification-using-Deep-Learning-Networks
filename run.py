@@ -77,7 +77,7 @@ if args.cuda:
 if args.arc == 'Parallel':  # If two models are to be trained in parallel
     train_dataset1 = SpeechDataLoaderParallel(
                                               args.train_path,
-                                              "STFT",window_size=args.window_size,
+                                              "",window_size=args.window_size,
                                               window_stride=args.window_stride,
                                               window_type=args.window_type,
                                               normalize=args.normalize,
@@ -94,7 +94,7 @@ if args.arc == 'Parallel':  # If two models are to be trained in parallel
                                                 
     valid_dataset1 = SpeechDataLoaderParallel(
                                               args.valid_path,
-                                              "STFT", window_size=args.window_size,
+                                              "", window_size=args.window_size,
                                               window_stride=args.window_stride,
                                               window_type=args.window_type,
                                               normalize=args.normalize,
@@ -111,7 +111,7 @@ if args.arc == 'Parallel':  # If two models are to be trained in parallel
                                                 
     test_dataset1 = SpeechDataLoaderParallel(
                                              args.test_path,
-                                             "STFT",
+                                             "",
                                              window_size=args.window_size,
                                              window_stride=args.window_stride,
                                              window_type=args.window_type,
@@ -260,8 +260,8 @@ elif args.arc.startswith('ResNet'):
             print("Wrong input format")
 
 elif args.arc == 'Parallel':
-#model=ParallelNet(17816)
-    model=ParallelNet(10752)
+
+    model=ParallelNet(13056)
 else:
     #Lenet with STFT
     model = LeNet(16280)

@@ -269,15 +269,13 @@ class ParallelNet(nn.Module):
         self.conv2_2 = nn.Conv2d(16, 32, kernel_size=3)
         self.bn2_2 = nn.BatchNorm2d(32)
         
-        self.conv2_2_drop = nn.Dropout2d()
         self.conv3_2 = nn.Conv2d(32, 32, kernel_size=3)
         self.bn3_2 = nn.BatchNorm2d(32)
-        
         
         self.conv4_2 = nn.Conv2d(32, 64, kernel_size=3)
         self.bn4_2 = nn.BatchNorm2d(64)
         
-        self.conv3_2_drop = nn.Dropout2d()
+        self.conv2_drop = nn.Dropout2d()
         
         
         self.conv1 = nn.Conv1d(1, 128, kernel_size=80, stride=4)
@@ -295,7 +293,6 @@ class ParallelNet(nn.Module):
         
         self.max_pool_3=nn.MaxPool1d(4)
         
-        
         self.conv4 = nn.Conv1d(256, 256, kernel_size=3, stride=1)
         self.bn4 = nn.BatchNorm1d(256)
         
@@ -312,7 +309,7 @@ class ParallelNet(nn.Module):
         x1 = self.bn1_2(F.relu(self.conv1_2(x1)))
         x1 = F.max_pool2d(self.bn2_2(F.relu(self.conv2_2(x1))), 2)
         x1 = F.max_pool2d(self.bn3_2(F.relu(self.conv3_2(x1))), 2)
-        x1 = F.max_pool2d(self.conv2_2_drop(self.bn4_2(F.relu(self.conv4_2(x1)))), 2)
+        x1 = F.max_pool2d(self.conv2_drop(self.bn4_2(F.relu(self.conv4_2(x1)))), 2)
         
         
         x2 = self.max_pool_1(self.bn1(F.relu(self.conv1(x2))))
@@ -320,14 +317,13 @@ class ParallelNet(nn.Module):
         x2 = self.max_pool_3(self.bn3(F.relu(self.conv3(x2))))
         x2 = self.max_pool_4(self.bn4(F.relu(self.conv4(x2))))
         x2 = self.avg_pool_5(self.bn5(F.relu(self.conv5(x2))))
-        #print(x2.shape)
+
         
         x1 = x1.view(x1.size(0), -1)
         x2 = x2.view(x2.size(0), -1)
-        #print(x1.shape)
-        #print(x2.shape)
+        
         y = torch.cat((x1,x2),dim=1)
-        #print(y.shape)
+        
         x = F.relu(self.fc1(y))
         x = F.dropout(x, training=self.training)
         x = self.fc2(x)

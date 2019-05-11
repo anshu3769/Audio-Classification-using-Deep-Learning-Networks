@@ -39,7 +39,7 @@ def parallel_train(loader, model, optimizer, epoch, cuda, log_interval, loss_fun
                     epoch, batch_idx * len(data1), len(loader.dataset), 100.
                     * batch_idx / len(loader), loss.data))
 
-    global_epoch_loss=global_epoch_loss / len(loader.dataset)
+        global_epoch_loss=global_epoch_loss / len(loader.dataset)
 
     print('\nTrain set: Average loss: {:.4f}\n'.format(
                                                        global_epoch_loss))
