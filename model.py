@@ -397,8 +397,8 @@ class CNN1D(nn.Module):
         
         x = x.view(x.size(0), -1)
 
-        #x = F.relu(self.fc1_drop(self.fc1(x)))
-        x = F.relu(self.fc1(x))
+        x = F.relu(self.fc1_drop(self.fc1(x)))
+        #x = F.relu(self.fc1(x))
         
         return F.log_softmax(x, dim=1)
 ################# CNN 1D #####################################
