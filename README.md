@@ -1,4 +1,4 @@
-# Speech to Text Classification (Keyword spotting)
+# Audio Classification using Deep Learning Networks (Keyword spotting)
 The aim of the project is to analyse performance of various neural networks in identifying the word spoken by a person. The data used in this process is Google command dataset. It contains ~65k audio files each of which has a word spoken by a person  anf tag for that file which is the text for that audio file. There are 30 different words in the dataset spoken by different people. Thus, the task is to classify the audio files based on the word spoken. We ran the following neural networks to perform the task:
 1. Lenet
 2. VGG
