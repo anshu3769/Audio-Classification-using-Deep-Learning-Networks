@@ -5,11 +5,7 @@ The aim of the project is to analyse performance of various neural networks in i
 3. ResNet
 4. CNNRNN
 5. CNN-1D
-6. Parallel Net ( combination of two netoworks trained in parallel)
-
-# Performance of the networks
-The following table shows the accuracies of the trained networks:
-
+6. Parallel Net ( combination of two networks trained in parallel)
 
 # Steps to train/test a model
 Please follow the steps to train/test a model: 
