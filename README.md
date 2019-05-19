@@ -7,6 +7,8 @@ The aim of the project is to analyse performance of various neural networks in i
 5. CNN-1D
 6. Parallel Net ( combination of two networks trained in parallel)
 
+The output/ directory contains the training logs for these networks. The models/ directory contains the trained models for the best performing configurations. These models can be loaded directly in memory and used for classification.
+
 # Steps to train/test a model
 Please follow the steps to train/test a model: 
 ## Setup the environment
